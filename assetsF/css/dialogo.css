@@ -1,0 +1,51 @@
+.dialogo{
+    margin:                auto;   // Centrado
+    border:                   0;
+    border-color:       #950054;
+    padding:               20px;
+    border-radius:          4px;
+    background-color:     white;
+}
+.dialogo_header{
+    display: flex;
+    justify-content: flex-end;
+    border:                   1;
+    border-color:       #950054;
+}
+.dialogo_body{
+    padding-top:        10px;
+    padding-right:      30px;
+    padding-left:       30px;
+    padding-bottom:     30px;
+    font-size:          24px;
+    color:              #D5007F;
+}
+#dialogo_close, #dialogo_close1{
+    font-size : 32px;
+    user-select: none;
+    cursor: pointer;
+}
+.claseX{
+    font-size : 32px;
+    user-select: none;
+    cursor: pointer;
+}
+.dialogo_botones{
+     display: block; /* Asegurarse de que el mensaje esté en un elemento de bloque separado */
+    text-align: center; /* Centrar el texto horizontalmente */
+}
+/*.dialogo_body { */
+/*    display: block; /* Utilizar un contenedor flex para alinear los botones horizontalmente */
+/*    justify-content: center; /* Centrar los elementos horizontalmente dentro del contenedor */
+/*}*/
+.dialogo_body p {
+    display: block; /* Asegurarse de que el mensaje esté en un elemento de bloque separado */
+    text-align: center; /* Centrar el texto horizontalmente */
+    margin: 0 auto; /* Centrar los botones horizontalmente */
+}
+
+.mensaje {
+    word-wrap: break-word; /* Permite que las palabras largas se rompan y se ajusten */
+    white-space: pre-wrap; /* Preserva los saltos de línea y permite el ajuste automático del texto */
+    /* Otras propiedades de estilo que desees aplicar */
+}

@@ -1,0 +1,36 @@
+.caja_capturar {
+  min-width: 10%;
+  margin: 2px;
+  padding: 2px;
+  font-size: 14px;
+  display: inline-flex;
+  /*align-items: center;*/
+}
+
+.caja_capturar label {
+  color: rgb(149, 0, 84);
+  font-weight: bold;
+  margin-left: 10px;
+  cursor: pointer; /* Agregado para indicar que el elemento es interactivo */
+}
+
+.caja_capturar input[type="radio"] {
+  display: none; /* Oculta el radio predeterminado */
+}
+
+/* Estilo para el círculo alrededor del radio seleccionado y para el no seleccionado */
+.caja_capturar input[type="radio"] + label::before {
+  content: '';
+  display: inline-block;
+  width: 14px; /* Tamaño del círculo */
+  height: 14px;
+  border-radius: 50%;
+  background-color: transparent; /* Color del círculo para opciones no seleccionadas */
+  border: 2px solid rgb(149, 0, 84); /* Borde del círculo */
+  margin-right: 8px; /* Espacio entre el círculo y la etiqueta */
+}
+
+/* Estilo para el círculo de la opción seleccionada */
+.caja_capturar input[type="radio"]:checked + label::before {
+  background-color: rgb(149, 0, 84); /* Color rosa para la opción seleccionada */
+}

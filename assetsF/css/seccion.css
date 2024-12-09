@@ -1,0 +1,512 @@
+/*
+Rosa mexicano - D5007F
+Vino - rgb (149,0,84) - 950054
+gris - rgb ( 178,178,178)
+negro - rgb(29,29,27)
+Azul oscuro - rgb (15,26,47) - 0F1A2F
+*/
+.clearfix{
+    float: none;
+    clear:both;
+}
+
+.seccion_caja{
+	display			: flex;
+    justify-content	: center;
+    align-items		: center;
+	border			: 1px solid #c9c9c9;
+	width			: 100%;
+	margin			: 4px 4px 4px 4px;
+	padding			: 1px 1px 1px 1px;
+}
+.seccion_caja_Izquierda{
+    display         : flex;
+    justify-content : left;
+    align-items     : left;
+    border          : 1px solid #c9c9c9;
+    width           : 100%;
+    margin          : 4px 4px 4px 4px;
+    padding         : 1px 1px 1px 1px;
+}
+.seccion_caja1{
+    display         : flex;
+    flex-direction  : row;
+    justify-content : center;
+    align-items     : center;
+    border          : 1px solid #c9c9c9;
+    width           : 100%;
+    margin          : 2px 2px 4px 2px;
+    padding         : 1px 1px 1px 1px;
+}
+.caja_captura{
+	min-width: 10%;	
+	margin:2px 2px 2px 2px;
+	padding: 2px 2px 2px 2px;
+	font-size: 14px;
+	display:inline-block;
+}
+.caja_captura1{
+    min-width: 10%; 
+    width: min-content  !important;
+    margin:1px 1px 1px 1px;
+    padding: 1px 1px 1px 1px;
+    font-size: 14px;
+    display:inline-block;
+}
+.caja_captura label{
+	color: rgb(149,0,84);
+	display: block;
+	width: 90%;
+	font-weight: bold;
+	margin-bottom: 4px;
+}
+.caja_captura_check{
+    color: rgb(149,0,84);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+.caja_captura_check label{
+    color: rgb(149,0,84);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.caja_captura1 label{
+    color: rgb(149,0,84);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.caja_captura select{
+	color: rgb(29,29,27);
+	display: block;
+	width: 90%;
+	font-weight: bold;
+	font-size: 16px;
+}
+.caja_captura1 select{
+    color: rgb(29,29,27);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    font-size: 16px;
+}
+.caja_captura input[type="text"]{
+	color: rgb(29,29,27);
+	display: block;
+	width: 90%;
+	font-weight: bold;
+	font-size: 14px;
+}
+.caja_captura1 .corto{
+    min-width: 20%; 
+    width: 50%;
+    color: rgb(29,29,27);
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+}
+.caja_captura2{
+    width: 10% !important; 
+    margin:2px 2px 2px 2px;
+    padding: 2px 2px 2px 2px;
+    font-size: 14px;
+    display:inline-block;
+}
+.caja_captura2 label{
+    color: rgb(149,0,84);
+    display: block;
+    width: 70%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.caja_captura2 select{
+    color: rgb(29,29,27);
+    display: block;
+    width: 70%;
+    font-weight: bold;
+    font-size: 16px;
+}
+.caja_captura2 input[type="text"]{
+    color: rgb(29,29,27);
+    display: block;
+    width: 70%;
+    font-weight: bold;
+    font-size: 14px;
+}
+/* ---------------------------------------- */
+.seccion_caja .form-field-button_{
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+    margin: 10px 0 10px 0;
+    transition: .3s ease all;
+    gap:10px;
+}
+.seccion_caja_Izquierda .form-field-button_{
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+    margin: 1px 0 1px 0;
+    transition: .3s ease all;
+    gap:10px;
+}
+.seccion_caja1 .form-field-button_{
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    text-align: center;
+    margin: 1px 0 1px 0;
+    transition: .3s ease all;
+    gap:10px;
+}
+.section .desabilitado{
+  pointer-events: none;
+  display: none;
+  opacity: 0.5;
+}
+
+.btn_1{
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 25px;
+    letter-spacing: 2px;
+    min-width: 200px;
+    max-width: 500px;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+.btn_1:hover{
+    text-decoration: none;
+}
+
+.btn1{
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 45px;
+    letter-spacing: 3px;
+    max-width: 300px;
+    position: relative;
+    text-decoration: none;
+    text-transform: uppercase;
+    width: 100%;
+}
+
+/* para carga de archivos */
+.inputF-file1{
+    display: none;
+}
+
+.inputF-label1{
+    width: 90%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    color: #cd2f8a;
+    border: 2px solid #cd2f8a;
+    box-shadow: 2px 1px 7px 6px #dfdfdf inset;
+    font-size: 1.2rem;
+    font-family: inherit;
+    text-transform: uppercase;
+
+    cursor: pointer;
+    user-select: none;
+    transition: .6s ease all;
+}
+
+.inputF-label1:hover{
+    background-color: #cd2f8a;
+    color: white;
+    box-shadow: 2px 1px 7px 6px #99095c inset;
+}
+
+.seccion_caja_despliegue{
+    justify-content	: center;
+    align-items		: center;
+	border			: 2px solid #c9c9c9;
+	width			: 100%;
+	margin			: 5px 5px 5px 5px;
+	padding			: 2px 2px 2px 2px;
+    overflow-y      : scroll; /* Habilita el scroll vertical */
+}
+.seccion_caja_despliegue_70{
+    justify-content : center;
+    align-items     : center;
+    border          : 2px solid #c9c9c9;
+    width           : 100%;
+    margin          : 5px 5px 5px 5px;
+    padding         : 2px 2px 2px 2px;
+    height          : auto;
+    /*overflow-y      : scroll; /* Habilita el scroll vertical */
+}
+.form_field_despliegue{
+	display: inline-flex;
+	min-width: 48%;
+	max-width: 48%;
+	font-size: 14px;
+	color: rgb(149,0,84);
+}
+
+.form_field_despliegue input[type="text"]{
+	color: rgb(29,29,27);
+	display: block;
+	font-size: 14px;
+}
+
+.form_field_despliegue label{
+	color: rgb(149,0,84);
+	display: block;
+	font-weight: bold;
+	margin-bottom: 1px;
+}
+/* Tabla html para el buzon */
+.tabla-con-cuadricula {
+    border-collapse : collapse; /* Combina los bordes de las celdas */
+    width           : 100%; /* Ancho de la tabla */
+    overflow-y      : scroll; /* auto; */
+    height          : 500px;
+}
+
+.tabla-con-cuadricula th, .tabla-con-cuadricula td {
+    border        : 1px solid #000; /* Borde de 1 píxel sólido en las celdas */
+    padding       : 4px; /* Espaciado interior para el contenido de las celdas */
+    text-align    : left; /* Alineación del texto en el centro */
+}
+
+.tabla-con-cuadricula th {
+    background-color: #950054; /* Color de fondo para las celdas de encabezado */
+    color:white;
+    font-size: 14px;
+    /* Estilo para las filas de encabezado */
+    position: sticky;
+    top: 0;
+}
+
+/* Estilos opcionales para las filas pares e impares */
+.tabla-con-cuadricula tr:nth-child(even) {
+    background-color: #e0e0e0; /* Color de fondo para filas pares */
+}
+
+.tabla-con-cuadricula tr:nth-child(odd) {
+    background-color: #ffffff; /* Color de fondo para filas impares */
+}
+
+.mi-checkbox__ {
+    /* Estilos de fondo y borde cuando el checkbox está seleccionado */
+    appearance          : none; /* Borra lo default*/
+    cursor              : pointer;
+    background-color    : #950054; /* Color de fondo verde */
+    border              : 1px solid black; /* Borde verde */
+    color               : white; /* Color de texto blanco */
+}
+
+.mi-checkbox {
+  cursor: pointer;
+  background-color: #fff;
+  color: #fff;
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  width: 24px;
+  height: 24px;
+  appearance: none;
+  border: 2px solid #888;
+  background-position: 0 -2rem;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  transition: all 0.3s ease-in-out;
+}
+
+.mi-checkbox:checked {
+  background-color: #950054;
+  color: rgb(75, 156, 13);
+  background-position: 0 0;
+}
+
+/* Estilo para el botón */
+.mi-boton {
+  /* Estilos de fondo y color de texto del botón */
+  background-color: #950054; /* Color de fondo naranja */
+  color: white; /* Color de texto blanco */
+  /* Otros estilos, como bordes y márgenes, según sea necesario */
+}
+
+.micol-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+.mirow {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.mipage-item {
+    display: inline-block;
+}
+
+.mipage-item.active .mipage-link {
+    z-index: 3;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.mipagination {
+    display: flex;
+    padding-left: 0;
+    list-style: none;
+}
+
+.mipage-link {
+    position: relative;
+    display: block;
+    padding: 0.5rem 0.75rem;
+    margin-left: -1px;
+    line-height: 1.25;
+    color: #007bff;
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5; /* Opcional: Cambiar la opacidad para indicar visualmente que está deshabilitado */
+}
+
+.enabled {
+  pointer-events: auto;
+  opacity: 1; /* Restaurar la opacidad al valor predeterminado */
+}
+
+/* ------------------------- */
+.forms-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.forms-row:first-child .cell1 {
+    font-weight: bold;
+}
+.forms-row .cell {
+    flex: 1;
+    padding: 5px;
+}
+.forms-row .cell1 {
+    flex: 1;
+    align-content: center;
+    padding: 5px;
+}
+.forms-row input[type="text"] {
+    width: calc(100% - 10px);
+    box-sizing: border-box;
+}
+
+/* ----------------------------- */
+
+
+.cell1 input[type="text"] {
+    border: none; /* Remueve el borde del input */
+    background: none; /* Remueve el fondo del input */
+    text-align: center; /* Centra el texto */
+    font-weight: bold; /* Hace el texto negrita */
+}
+
+.cell1 {
+    flex: 1;
+    padding: 5px;
+}
+
+#loader-container {
+    display: none; /* Se muestra cuando se necesita */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo semi-transparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;  /* Para asegurarse de que está por encima de otros elementos */
+}
+
+#loader {
+    background-color: #98005B;
+    padding: 20px 30px; /* Padding ajustado para hacer el loader un poco más grande */
+    border-radius: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Sombra para hacer que el loader resalte */
+}
+
+.letra_chica{
+    font-size: 12px;
+}
+/*
+.checkChico {
+    transform: scale(0.4); /* Ajusta el tamaño del checkbox 
+    margin-right: 2px;  Espacio entre el checkbox y el texto 
+    cursor: pointer;    Cambia el cursor para indicar interactividad 
+    vertical-align: middle; Alinea verticalmente el checkbox con el texto 
+}
+*/
+/*
+.checkChico {
+    width: 16px; /* Ajusta el tamaño del checkbox 
+    height: 16px; /* Ajusta el tamaño del checkbox 
+    margin-right: 2px; /* Espacio entre el checkbox y el texto 
+    cursor: pointer; /* Cambia el cursor para indicar interactividad 
+    vertical-align: middle; /* Alinea verticalmente el checkbox con el texto 
+    position: relative;
+    appearance: none; /* Elimina el estilo predeterminado del checkbox 
+    background: #fff; /* Fondo blanco 
+    border: 2px solid #000; /* Borde negro 
+    border-radius: 3px; /* Bordes redondeados 
+}
+
+/* Estilo para el estado checked 
+.checkChico:checked::before {
+    content: '✔'; /* Marca de verificación 
+    display: block;
+    text-align: center;
+    line-height: 16px; /* Alinea la marca verticalmente 
+    color: #000; /* Color de la marca 
+}
+*/
+
+.checkchico {
+    cursor: pointer;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+    width: 20px;
+    height: 20px;
+    appearance: none;
+    border: 1px solid #888;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.checkchico:checked {
+  background-color: blue; /* #cd2f8a; */
+}
