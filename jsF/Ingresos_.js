@@ -536,14 +536,14 @@ function paginaMovimientos(cPag){
 			break;
 		}
 	}
-
+	cTabla = "atablas.t_" + cCta;
 	//
 	aDatos = {
 		opcion 			: "ConsultaMovimientosBancarios",
 		limite			: document.getElementById("num_registros").value,
 		busca			: document.getElementById("campo").value,
 		pagina 			: pagina,
-		tabla			: " movimientos a , operacionesbancarias b ",
+		tabla			: " " + cTabla + " a , operacionesbancarias b ",
 		tablaPrin		: "movimientos",
 		join			: " a.idoperacion=b.idoperacion and b.tipo='"+gTipoMov+"' and idcuentabancaria='"+cCta+"' ",
 		campos			: cCampos,
@@ -660,6 +660,8 @@ function CargaCatalogos(vRes){
 	}else{
 		mandaMensaje("No se han definido los controles bancarios");
 	}
+	document.getElementById("idFecha").setAttribute('max', dHoy);
+	document.getElementById("idFechaCan").setAttribute('max', dHoy);
 	NuevoMovimiento('n');
 }
 // __________________________________________________________________________________

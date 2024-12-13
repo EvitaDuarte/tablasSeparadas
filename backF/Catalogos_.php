@@ -120,15 +120,29 @@ return;
 // _________________________________________________
 function CargaCuentasBancarias(&$respuesta){
 
-	$sql = "select idcuentabancaria, nombre, siglas, estatus, consecutivo, usuarioalta, fechaalta ".
-		   " from cuentasbancarias order by idcuentabancaria";
+	$sql = "select idcuentabancaria, a.nombre, siglas, estatus, consecutivo, usuarioalta, fechaalta, se_concilia, b.nombre as banco ".
+		   " from cuentasbancarias a, bancos b where a.idbanco=b.idbanco order by idcuentabancaria";
 	$res = ejecutaSQL_($sql);
 	if ( $res!=null){
 		$respuesta["resultados"] = $res;
-		$respuesta["success"]	 = true;
-		$respuesta["mensaje"]	 = "";
+		$sql = "select idbanco as clave, nombre as descripcion from public.bancos order by idbanco";
+		$res = ejecutaSQL_($sql);
+		if ($res!==null){
+			$respuesta["bancos"] 	 = $res;
+			$respuesta["success"]	 = true;
+			$respuesta["mensaje"]	 = "";
+		}else{
+			$respuesta["mensaje"]	 = "No hay Bancos en el Sistema";
+		}
 	}else{
 		$respuesta["mensaje"] = "No hay aún Cuentas Bancarias en el Sistema";
+		$sql = "select idbanco as clave, nombre as descripcion from public.bancos order by idbanco";
+		$res = ejecutaSQL_($sql);
+		if ($res!==null){
+			$respuesta["bancos"] 	 = $res;
+			$respuesta["success"]	 = true;
+			$respuesta["mensaje"]	 = "";
+		}
 	}
 }
 // _________________________________________________
@@ -142,13 +156,14 @@ function AgregaCuentaBancaria(&$respuesta){
 	if ( !( $oCuentaBancaria->ExisteCuentaBancaria($conn_pdo,$respuesta,"Adicionar") ) ){
 		try {
 			$conn_pdo->beginTransaction();
+			$oCuentaBancaria->existeTabla( $respuesta["datos"]["idCuentaBancaria"] , $respuesta );
 			$oCuentaBancaria->guardar($conn_pdo,"Adicionar",$respuesta);
 		    $conn_pdo->commit();
 	    	CargaCuentasBancarias($respuesta); // Actualiza para refrescar la tabla HTML
-	    	$respuesta["mensaje"] 	= "Se dio de alta la Cuenta Bancaria solicitada";
+	    	$respuesta["mensaje"] 	= "Se dio de alta la Cuenta Bancaria solicitada..";
 	    	$respuesta["success"] 	= true;	
 		} catch (Exception $e) {
-			$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+			$respuesta["mensaje"] = "a)Ocurrió una excepción [" . $e->getMessage() . "]";
 			$conn_pdo->rollBack();
 		}
 	}
@@ -171,7 +186,7 @@ function ModificaCuentaBancaria(&$respuesta){
 	    	$respuesta["mensaje"] 	= "Se actualizó correctamente la Cuenta Bancaria solicitada";
 	    	$respuesta["success"] 	= true;	
 		} catch (Exception $e) {
-			$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+			$respuesta["mensaje"] = "b)Ocurrió una excepción [" . $e->getMessage() . "]";
 			$conn_pdo->rollBack();
 		}
 	}
@@ -198,7 +213,7 @@ function EliminaCuentaBancaria(&$respuesta){
 						$conn_pdo->rollBack();
 					}
 				} catch (Exception $e) {
-					$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+					$respuesta["mensaje"] = "c)Ocurrió una excepción [" . $e->getMessage() . "]";
 					$conn_pdo->rollBack();
 				}
 			}else{
@@ -259,7 +274,7 @@ function AgregaOperacion(&$respuesta){
 		    	$respuesta["mensaje"] 	= "La base de datos rechazo agregar la operación";
 		    }
 		} catch (Exception $e) {
-			$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+			$respuesta["mensaje"] = "d)Ocurrió una excepción [" . $e->getMessage() . "]";
 			$conn_pdo->rollBack();
 		}
 	}
@@ -291,7 +306,7 @@ function ModificaOperacion(&$respuesta){
 		    	$respuesta["mensaje"] 	= "Los datos para modificar la operación son incorrectos";
 		    }
 		} catch (Exception $e) {
-			$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+			$respuesta["mensaje"] = "e)Ocurrió una excepción [" . $e->getMessage() . "]";
 			$conn_pdo->rollBack();
 		}
 	}
@@ -305,25 +320,29 @@ function EliminaOperacion(&$respuesta){
 	try{
 		$oOperacionBancaria = new operacionBancaria($respuesta["datos"],$respuesta["sesion"]["idUsuario"]); // Crea el Objeto 
 		if ( ( $oOperacionBancaria->ExisteOperacion($conn_pdo,$respuesta,"Eliminar") ) ){
-			if ($oOperacionBancaria->noTieneControles() ){
-				$conn_pdo->beginTransaction();
-				if ( $oOperacionBancaria->eliminaOperacion($conn_pdo,"Eliminar",$respuesta)){
-					bitacora($conn_pdo, $respuesta["sesion"]["idUsuario"],"","Cata/Operacion/Eliminar","idOperacion: ".
-										 json_encode($respuesta['datos']),0.00 );
-			    	$conn_pdo->commit();
-		    		ConsultaOperacionesBancarias($respuesta); // Actualiza para refrescar la tabla HTML
-		    		$respuesta["mensaje"] 	= "Se eliminó correctamente la Operación Bancaria solicitada";
-		    		$respuesta["success"] 	= true;	
-		    	}else{
-		    		$respuesta["mensaje"] 	= "No fue posible eliminar la Operación Bancaria. Esta enlazada con otra información";
-		    	}
-		    }else{
-		    	$respuesta["mensaje"] = "No procede, la operación tiene asignado controles bancarios";
-		    }
+			if ( tieneMovimientos("idoperacion",$respuesta["datos"]["idOperacion"],$respuesta)===false){ // No tiene movimientos asociados
+				if ($oOperacionBancaria->noTieneControles() ){
+					$conn_pdo->beginTransaction();
+					if ( $oOperacionBancaria->eliminaOperacion($conn_pdo,"Eliminar",$respuesta)){
+						bitacora($conn_pdo, $respuesta["sesion"]["idUsuario"],"","Cata/Operacion/Eliminar","idOperacion: ".
+											 json_encode($respuesta['datos']),0.00 );
+				    	$conn_pdo->commit();
+			    		ConsultaOperacionesBancarias($respuesta); // Actualiza para refrescar la tabla HTML
+			    		$respuesta["mensaje"] 	= "Se eliminó correctamente la Operación Bancaria solicitada";
+			    		$respuesta["success"] 	= true;	
+			    	}else{
+			    		$respuesta["mensaje"] 	= "No fue posible eliminar la Operación Bancaria. Esta enlazada con otra información";
+			    	}
+			    }else{
+			    	$respuesta["mensaje"] = "No procede, la operación tiene asignado controles bancarios";
+			    }
+		   	}else{
+		   		$respuesta["mensaje"] = "No procede, la operación tiene movimientos bancarios asociados";
+		   	}
 		}
 		unset($oOperacionBancaria);// Se destruye el Objeto
 	} catch (Exception $e) {
-		$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "] en EliminaOperacion";
+		$respuesta["mensaje"] = "f)Ocurrió una excepción [" . $e->getMessage() . "] en EliminaOperacion";
 		$conn_pdo->rollBack();
 	}
 }
@@ -395,7 +414,7 @@ function AgregaControl(&$respuesta){
 		    }
 		}
 	} catch (Exception $e) {
-		$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+		$respuesta["mensaje"] = "g)Ocurrió una excepción [" . $e->getMessage() . "]";
 		$conn_pdo->rollBack();
 	}
 	unset($oControlBancario);// Se destruye el Objeto
@@ -426,7 +445,7 @@ function ModificaControl(&$respuesta){
 		    }
 		}
 	} catch (Exception $e) {
-		$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "]";
+		$respuesta["mensaje"] = "h)Ocurrió una excepción [" . $e->getMessage() . "]";
 		$conn_pdo->rollBack();
 	}
 	unset($oControlBancario);// Se destruye el Objeto
@@ -436,9 +455,12 @@ function EliminaControl(&$respuesta){
 	global $conn_pdo;	// Variable global que tiene la conexión a la Base de Datos
 	require_once("../pdoF/controles_.php");
 	try{
+		$cCampo			  = "idcontrol";
+		$cControl		  = $respuesta["datos"]["idControl"];
 		$oControlBancario = new controlBancario($respuesta["datos"],$respuesta["sesion"]["idUsuario"]); // Crea el Objeto 
 		if ( ( $oControlBancario->ExisteControl($conn_pdo,$respuesta,"Eliminar") ) ){
-			if ( $oControlBancario->noTieneMovimientos()){
+			/*if ( $oControlBancario->noTieneMovimientos()){ */
+			if ( tieneMovimientos($cCampo,$cControl,$respuesta)===false ){
 				$conn_pdo->beginTransaction();
 				if ( $oControlBancario->eliminaControl($conn_pdo,"Eliminar",$respuesta)){
 					bitacora($conn_pdo, $respuesta["sesion"]["idUsuario"],"","Cata/Control-Operación/Eliminar","Ctrl-Ope: ".
@@ -451,12 +473,12 @@ function EliminaControl(&$respuesta){
 		    		$respuesta["mensaje"] 	= "No fue posible eliminar el Control-Operación. Esta enlazada con otra información";
 		    	}
 	    	}else{
-	    		$respuesta["mensaje"] = "No procede, la combinación operación-control tiene movimientos asignados";
+	    		$respuesta["mensaje"] = "No procede, el control $cControl tiene movimientos asignados";
 	    	}
 		}
 		unset($oControlBancario);// Se destruye el Objeto
-	} catch (Exception $e) {
-		$respuesta["mensaje"] = "Ocurrió una excepción [" . $e->getMessage() . "] en EliminaControl";
+	}catch (Exception $e) {
+		$respuesta["mensaje"] = "i)Ocurrió una excepción [" . $e->getMessage() . "] en EliminaControl";
 		$conn_pdo->rollBack();
 	}
 }

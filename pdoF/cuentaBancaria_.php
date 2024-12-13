@@ -16,6 +16,9 @@ class cuentaBancaria{
 	private $consecutivo;
 	private $usuarioAlta;
 	private $fechaAlta;
+	private $tabla;
+	private $concilia;
+	private $banco;
 	//
 	const TABLA = 'cuentasbancarias';
 
@@ -29,6 +32,10 @@ class cuentaBancaria{
 			$this->consecutivo		= $aDatos["consecutivo"];
 			$this->usuarioAlta		= $usuarioAlta;
 			$this->estatus 			= ($this->estatus=="on")?"true":"false";
+			$this->tabla			= "t_" . trim($aDatos["idCuentaBancaria"]);
+			$this->concilia			= $aDatos["concilia"];
+			$this->concilia 		= ($this->concilia=="on")?"true":"false";
+			$this->banco			= pg_escape_string($aDatos["banco"]);
 		}
 	}
 	// -------------------------------
@@ -50,6 +57,12 @@ class cuentaBancaria{
  	public function get_usuarioAlta(){
 		return $this->usuarioAlta;
 	}
+	public function get_tabla(){
+		return $this->tabla;
+	}
+	public function get_concilia(){
+		return $this->concilia;
+	}
 	// ---------------------------------
  	public function set_idCuentaBancaria($idCuentaBancaria){
 		$this->idCuentaBancaria = $idCuentaBancaria;
@@ -69,30 +82,41 @@ class cuentaBancaria{
  	public function set_usuarioAlta($usuarioAlta){
 		$this->usuarioAlta = $usuarioAlta;
 	}
+ 	public function set_tabla($tabla){
+		$this->tabla = $tabla;
+	}
+ 	public function set_concilia($concilia){
+		$this->concilia = ($concilia=="on")?"true":"false";
+	}
 //  ____________________________________________________________________________________________________
 public function guardar($conexion,$operacion,&$respuesta){
 	$stmt = null;
 	// ----------------
 	if($operacion=="Modificar") /*Modifica*/ {
 		$stmt = $conexion->prepare(
-					'UPDATE ' . self::TABLA .' SET nombre = :nombre, siglas = :siglas, estatus = :estatus '.
-				   ' WHERE idcuentabancaria = :idCuentaBancaria');
+					'UPDATE ' . self::TABLA .' SET nombre = :nombre, siglas = :siglas, estatus = :estatus, '.
+					' tabla =:tabla, se_concilia=:concilia, idbanco=:banco ' .
+				    ' WHERE idcuentabancaria = :idCuentaBancaria');
 
 	}elseif ($operacion=="Adicionar") {
 		$stmt = $conexion->prepare('INSERT INTO cuentasbancarias '.
-				   ' (idcuentabancaria, nombre, siglas, estatus, consecutivo, usuarioalta ) ' .
-				   ' VALUES(:idCuentaBancaria, :nombre, :siglas, :estatus, :consecutivo, :usuarioalta)');
+				   ' (idcuentabancaria, nombre, siglas, estatus, consecutivo, usuarioalta, tabla, se_concilia, idbanco ) ' .
+				   ' VALUES(:idCuentaBancaria, :nombre, :siglas, :estatus, :consecutivo, :usuarioalta, :tabla, :concilia , :banco)');
 		$stmt->bindParam(':consecutivo', $this->consecutivo	, PDO::PARAM_INT);
 		$stmt->bindParam(':usuarioalta', $this->usuarioAlta , PDO::PARAM_STR);
 	}
-	
+	$respuesta["objeto"] = array($this->idCuentaBancaria,$this->nombre,$this->siglas,$this->estatus,$this->consecutivo,
+								 $this->usuarioAlta,$this->concilia,$this->banco);
 	$stmt->bindParam(':idCuentaBancaria'	, $this->idCuentaBancaria , PDO::PARAM_STR);
 	$stmt->bindParam(':nombre'				, $this->nombre 		  , PDO::PARAM_STR);
 	$stmt->bindParam(':siglas'				, $this->siglas 		  , PDO::PARAM_STR);
 	$stmt->bindParam(':estatus'				, $this->estatus	  	  , PDO::PARAM_INT);
+	$stmt->bindParam(':concilia'			, $this->concilia	  	  , PDO::PARAM_INT);
+	$stmt->bindParam(':banco'				, $this->banco		  	  , PDO::PARAM_INT);
+	$stmt->bindParam(':tabla'				, $this->tabla	  	  	  , PDO::PARAM_STR);
 	// ------------
 	$respuesta["depura"] = $stmt->execute();
-	$respuesta["objeto"] = array($this->idCuentaBancaria,$this->nombre,$this->siglas,$this->estatus,$this->consecutivo,$this->usuarioAlta);
+
 }
 //  ____________________________________________________________________________________________________
 public function ExisteCuentaBancaria($conexion,&$respuesta,$operacion){
@@ -169,11 +193,64 @@ public function notieneAccesos(&$respuesta){
 }
 //  ____________________________________________________________________________________________________
 public function noTieneMovimientosBancarios(){
-	$vId = pg_escape_string($this->idCuentaBancaria); // Evita cualquier inyección de código
-	$sql = "select idcuentabancaria as salida from movimientos where idcuentabancaria='$vId'";
-	$res = getcampo($sql);
+	$cTabla = nombreTabla($this->idCuentaBancaria);
+	$vId    = pg_escape_string($this->idCuentaBancaria); // Evita cualquier inyección de código
+	$sql	= "select idcuentabancaria as salida from $cTabla where idcuentabancaria='$vId'";
+	$res	= getcampo($sql);
 	return ($res=="");
 }
+//  ____________________________________________________________________________________________________
+public function existeTabla($cCta,&$r){
+	$cTabla  = "t_" . trim($cCta);
+	$sql	 = " Select  exists (   select 1 from information_schema.tables 
+    		 	 where table_schema = 'atablas' and table_name = '$cTabla' ) as existe_tabla;";
+	$res	 = ejecutaSQL_($sql);
+	$lExiste = $res[0]["existe_tabla"];
+	if ( $lExiste==false ){
+		$cTabla = "atablas." . trim($cTabla);
+		$sql	= "CREATE TABLE $cTabla (LIKE atablas.machote INCLUDING ALL);";
+		$res	= ejecutaSQL_($sql);
+		$r["ct"]= $res;
+		// Solo se deben de copiar las llaves foráneas
+		$sql_constraints = "
+    			ALTER TABLE $cTabla
+    			ADD CONSTRAINT idcuentabancaria_unico CHECK (idcuentabancaria = '$cCta'),
+
+    			ADD CONSTRAINT fk_control_operacion FOREIGN KEY (idcontrol, idoperacion)
+		        REFERENCES public.controlesbancarios (idcontrol, idoperacion) MATCH SIMPLE
+		        ON UPDATE NO ACTION
+		        ON DELETE NO ACTION,
+		        
+			    ADD CONSTRAINT fk_cuenta FOREIGN KEY (idcuentabancaria)
+			        REFERENCES public.cuentasbancarias (idcuentabancaria) MATCH SIMPLE
+			        ON UPDATE NO ACTION
+			        ON DELETE NO ACTION,
+			        
+			    ADD CONSTRAINT fk_estatus FOREIGN KEY (estatus)
+			        REFERENCES public.movimientoestatus (estatus) MATCH SIMPLE
+			        ON UPDATE NO ACTION
+			        ON DELETE NO ACTION,
+			        
+			    ADD CONSTRAINT fk_machote_operaciones FOREIGN KEY (idoperacion)
+			        REFERENCES public.operacionesbancarias (idoperacion) MATCH SIMPLE
+			        ON UPDATE NO ACTION
+			        ON DELETE NO ACTION,
+			        
+			    ADD CONSTRAINT fk_unidad FOREIGN KEY (idunidad)
+			        REFERENCES public.unidades (idunidad) MATCH SIMPLE
+			        ON UPDATE NO ACTION
+			        ON DELETE NO ACTION;
+		";
+		$r["st"] = $sql_constraints;
+		$res	= ejecutaSQL_($sql_constraints);
+		$r["cc"]= $res;
+	}
+}
+//  ____________________________________________________________________________________________________
+//  ____________________________________________________________________________________________________
+//  ____________________________________________________________________________________________________
+//  ____________________________________________________________________________________________________
+//  ____________________________________________________________________________________________________
 //  ____________________________________________________________________________________________________
 }
 ?>

@@ -111,7 +111,7 @@ function limpiaImportes($cCta,$cFechaIni,&$respuesta){
 	// No se puede usar update ya que al acumular importes puede habaer días que no haya ingresos,
 	// ni egresos ni cheques y no traspasaría el saldo correctamente 
 	// $sql  =	"UPDATE saldos set ingresos = 0.00 , egresos = 0.00, cheques=0.00, saldoinicial=0.00 ".
-	//		" where idcuentabancaria='$cCta'  and fechasaldo>='$cFechaIni' ";
+	//		    " where idcuentabancaria='$cCta'  and fechasaldo>='$cFechaIni' ";
 	$sql  = "delete from saldos where idcuentabancaria='$cCta'  and fechasaldo>='$cFechaIni' ";
 			//var_dump($cCta);var_dump($cFechaIni);
 	try{ 
@@ -133,12 +133,13 @@ function acumulaImportes($cCta,$cFechaIni,&$respuesta){
 	// Se debe traer los datos por bloques para que no marque error de memoria
 	$limite = 2000; 	$offset = 0;
 	$lUna	= true; 	$lEntro = false;
+	$cTabla = "atablas.t_" . trim($cCta);
 	try{
 		$i=0;
 		while(true){
 			// Acumula Ingreos, Egresos, Cheques desde tabla de movimientos pod cuenta y fecha y tipo (IEC)
 			$sql =	"select a.idcuentabancaria , a.fechaoperacion  ,b.tipo ,  sum(a.importeoperacion) as suma " .
-					" from movimientos a , operacionesbancarias b " .
+					" from $cTabla a , operacionesbancarias b " .
 					" where a.idoperacion=b.idoperacion " .
 					" and a.idcuentabancaria='$cCta' " .
 					" and a.fechaoperacion >='$cFechaIni' " .
@@ -189,33 +190,6 @@ function acumulaImportes($cCta,$cFechaIni,&$respuesta){
 	return true;
 }
 // ______________________________________________________________
-/*function regAcumula($cCta,$fechaAnt,$nIng,$nEgr,$nChe,$oSaldo,&$respuesta){
-	global $conn_pdo;
-	try{
-		$stmt 	= null;
-		$nSaldo = $oSaldo->traeSaldoAnterior($cCta,$fechaAnt,false,$respuesta);
-
-		$stmt 	= $conn_pdo->prepare(
-				  "INSERT into saldos( ".
-							 "idcuentabancaria ,  fechasaldo,  saldoinicial,  ingresos,  egresos,  cheques ) values (".
-							 ":idcuentabancaria, :fechasaldo, :saldoinicial, :ingresos, :egresos, :cheques )");
-		$stmt->bindParam(':idcuentabancaria'	, $cCta 	, PDO::PARAM_STR);
-		$stmt->bindParam(':fechasaldo'			, $fechaAnt , PDO::PARAM_STR);
-		$stmt->bindParam(':saldoinicial'		, $nSaldo 	, PDO::PARAM_STR);
-		$stmt->bindParam(':ingresos'			, $nIng 	, PDO::PARAM_STR);
-		$stmt->bindParam(':egresos'				, $nEgr 	, PDO::PARAM_STR);
-		$stmt->bindParam(':cheques'				, $nChe 	, PDO::PARAM_STR);
-		$respuesta["ctas"][$cCta] = "$fechaAnt, $nSaldo, $nIng, $nEgr , $nChe <br>\n\r";
-		if ( !( $stmt->execute() ) ){
-			return false; // activar rollback
-		}else{
-			return true;
-		}
-	}catch(Exception $e){
-		$respuesta["mensaje"] .= "Ocurrió una excepción " . $e->getMessage();
-	}
-}*/
-
 // _______________________________________________________________
 
 ?>

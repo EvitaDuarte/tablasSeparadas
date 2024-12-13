@@ -21,26 +21,37 @@
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field inline-block-input" style="width:18% !important;">
-                                    <input type="text" name="idCuentaBancaria" id="idCuentaBancaria"  class="input-text" required maxlength=20
-                                    onkeyup="this.title=this.value;" onblur="soloNumerosGuion(this.value,'Cuenta Bancaria',this.id)">
-                                    <label for="idCuentaBancaria" class="label">Cuenta Bancaria</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:30% !important;">
-                                    <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=50
-                                    onkeyup="this.title=this.value;" onblur="soloCuenta('Nombre',this.id)">
-                                    <label for="nombre" class="label">Nombre</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:12% !important;">
-                                    <input type="text" name="siglas" id="siglas"  class="input-text" required maxlength=10
-                                    onkeyup="this.title=this.value;" onblur="soloSiglas('Siglas',this.id)">
-                                    <label for="siglas" class="label">Siglas</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:18%!important;" id="divActivo">
-                                    <input type="checkbox" id="estatus" name="estatus" checked="checked">
-                                    <label for="estatus" class="labelChk">¿ Activa ?</label>
-                                </div>
-                                <hr>
+                                <section class="seccion_caja_despliegue" id="secCta">
+                                    <div class="form-field inline-block-input" style="width:18% !important;">
+                                        <input type="text" name="idCuentaBancaria" id="idCuentaBancaria"  class="input-text" required maxlength=20
+                                        onkeyup="this.title=this.value;" onblur="soloNumerosGuion(this.value,'Cuenta Bancaria',this.id)">
+                                        <label for="idCuentaBancaria" class="label">Cuenta Bancaria</label>
+                                    </div>
+                                    <div class="form-field inline-block-input" style="width:30% !important;">
+                                        <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=50
+                                        onkeyup="this.title=this.value;" onblur="soloCuenta('Nombre',this.id)">
+                                        <label for="nombre" class="label">Nombre</label>
+                                    </div>
+                                    <div class="form-field inline-block-input" style="width:12% !important;">
+                                        <input type="text" name="siglas" id="siglas"  class="input-text" required maxlength=10
+                                        onkeyup="this.title=this.value;" onblur="soloSiglas('Siglas',this.id)">
+                                        <label for="siglas" class="label">Siglas</label>
+                                    </div>
+                                </section>
+                                <section class="seccion_caja_despliegue" id="despliegue">
+                                    <div class="caja_captura">
+                                        <label class="lbl_txt">Banco</label>
+                                         <select name="idBanco" id="idBanco" onfocus="this.click();" data-info="Banco" ></select>
+                                    </div>
+                                    <div class="form-field inline-block-input" style="width:18%!important;" id="divActivo">
+                                        <input type="checkbox" id="estatus" name="estatus" checked="checked">
+                                        <label for="estatus" class="labelChk">¿ Activa ?</label>
+                                    </div>
+                                    <div class="form-field inline-block-input" style="width:18%!important;" id="divActivo1">
+                                        <input type="checkbox" id="concilia" name="concilia">
+                                        <label for="concilia" class="labelChk">¿ Concilia ?</label>
+                                    </div>
+                                </section>
                                 <div class="form-field-button3" id="divBotones">
                                     <div class="form-field-button3" inline-block-input3>
                                         <a class="btn efecto" onclick="AgregaCuentaBancaria();">
@@ -73,7 +84,8 @@
                                                 <th>Nombre</th>
                                                 <th>Siglas</th>
                                                 <th>Activa?</th>
-                                                <th>Consecutivo</th>
+                                                <th>Concilia></th>
+                                                <th>Banco</th>
                                                 <th>Capturó</th>
                                                 <th>Fecha Alta</th>
                                             </tr>

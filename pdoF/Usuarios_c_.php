@@ -196,7 +196,7 @@ public function UsuarioModifica(&$respuesta){
 public function UsuarioEliminar(&$respuesta){
 	global $conn_pdo;	// Variable global que tiene la conexión a la Base de Datos
 	if ( $this->UsuarioExiste($respuesta,"eliminar") ){
-		if ( $this->UsuarioNotieneMovimientos() ){
+		if ( $this->UsuarioNotieneMovimientos($respuesta) ){
 			if ( $this->UsuarioNoTieneAsignadoCuentas() ){
 				// Se realizará el Delete usando transaccones
 				try{
@@ -230,16 +230,25 @@ public function UsuarioEliminar(&$respuesta){
 	}
 }
 // ________________________________________________________________	
-public function UsuarioNotieneMovimientos(){
+public function UsuarioNotieneMovimientos(&$r){
 	// return true; 
 	// No se puede eliminar un usuario que tenga movimientos o cuentas bancarias asignadas
 	$vIdUsuario  = pg_escape_string($this->idUsuario);
+	$lTieneMovs	 = tieneMovimientos("usuarioalta",$vIdUsuario,$r);
+
+	if ($lTieneMovs){
+		return false; // no se puede eliminar
+	}
+
+	return true;
+
+	/*
 	$sql = "select usuarioalta as salida from movimientos where usuarioalta='$vIdUsuario'";
 	$res = getcampo($sql);
 	if ($res!=""){ // Existen movimientos asignados a usuario
 		return false;
 	}
-	return true;
+	return true;*/
 }
 // ________________________________________________________________	
 public function UsuarioNoTieneAsignadoCuentas(){

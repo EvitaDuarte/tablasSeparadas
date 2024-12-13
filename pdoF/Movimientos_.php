@@ -67,9 +67,11 @@ function ActualizaMovimiento($conexion,$lAdiciona){
 	}else{
 		$fechaFormateada = DateTime::createFromFormat('d/m/Y', $this->fechaoperacion)->format('Y-m-d'); // El servidor español maneja otro formato
 	}
+
+	$cTabla = "atablas.t_" . trim($this->idcuentabancaria);
 	
 	if ( $lAdiciona){
-		$sql = 	"INSERT INTO movimientos (".
+		$sql = 	"INSERT INTO $cTabla (".
 			"idcuentabancaria, idoperacion, idcontrol, idunidad, referenciabancaria, ". 
 			"fechaoperacion, importeoperacion, beneficiario, concepto, anioejercicio, folio, ".
 			"buzon_captura, usuarioalta, estatus) VALUES (".
@@ -77,7 +79,7 @@ function ActualizaMovimiento($conexion,$lAdiciona){
 			":fechaoperacion, :importeoperacion, :beneficiario, :concepto, :anioejercicio, :folio,".
 			":buzon_captura, :usuarioalta, :estatus) ";
 	}else{
-		$sql = "UPDATE movimientos SET ".
+		$sql = "UPDATE $cTabla SET ".
 			   " idoperacion=:idoperacion		, idcontrol=:idcontrol				, idunidad=:idunidad			, referenciabancaria=:referenciabancaria, " .
 			   " fechaoperacion=:fechaoperacion , importeoperacion=:importeoperacion, beneficiario=:beneficiario	, concepto=:concepto, " .
 			   " anioejercicio=:anioejercicio	, folio=:folio 						, buzon_captura=:buzon_captura " .

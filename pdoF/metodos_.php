@@ -9,9 +9,10 @@ ini_set('display_errors', '1');
 class metodos{
 //  _______________________________________________________________________________________________
 public static function ExisteReferenciaBancaria($cRefBan,$cCtaBan){
+    $cTabla  = nombreTabla($cCtaBan);
     $cRefBan = pg_escape_string($cRefBan);
     $cCtaBan = pg_escape_string($cCtaBan);
-    $sql     = "select idmovimiento as salida from movimientos where " .
+    $sql     = "select idmovimiento as salida from $cTabla as movimientos where " .
                "referenciabancaria='$cRefBan' and idcuentabancaria='$cCtaBan' ";
     return getCampo($sql);     
 }
@@ -48,8 +49,9 @@ public static function CalculaSiglas($cMovOpe,$cCtrl,&$cSiglas,&$nDigitos,$cCtaB
 public static function TraeFolio($cCtaBan,$cAnio,$cSiglas,$nDigitos,&$respuesta){
     try{
         $cConse = $cSiglas . $cAnio ; // Parte fija del folio
+        $cTabla = nombreTabla($cCtaBan);
         // Busco el último folio parecido para la cuentaBancaria
-        $sql    = "select folio from movimientos where idcuentabancaria='$cCtaBan' and folio like '$cConse%' order by folio desc limit 1 ";
+        $sql    = "select folio from $cTabla where idcuentabancaria='$cCtaBan' and folio like '$cConse%' order by folio desc limit 1 ";
         $respuesta["depura"] =  $sql;
         $res    = ejecutaSQL_($sql);
         $respuesta["objeto"] =  $res;
@@ -175,17 +177,19 @@ public static function traeCuentasBancariasConciliadas(&$respuesta){
 }
 //  _______________________________________________________________________________________________
 public static function revisaReferenciaBancaria($cRefe,$cBan){
+    $cTabla= nombreTabla($cBan);
     $cRefe = pg_escape_string($cRefe); $cBan= pg_escape_string($cBan);
     $sql   = "select idmovimiento, idoperacion, referenciabancaria, fechaoperacion, importeoperacion, estatus " .
-             " from movimientos where idcuentabancaria='$cBan' and referenciabancaria='$cRefe' ";
+             " from $cTabla as movimientos where idcuentabancaria='$cBan' and referenciabancaria='$cRefe' ";
     $aDat  = ejecutaSQL_($sql);
     return $aDat;
 }
 //  _______________________________________________________________________________________________
 public static function revisaReferenciaBancariaImporte($cRefe,$cBan,$cImpo){
+    $cTabla= nombreTabla($cBan);
     $cRefe = pg_escape_string($cRefe); $cBan= pg_escape_string($cBan); $cImpo = pg_escape_string($cImpo);
     $sql   = "select idmovimiento, idoperacion, referenciabancaria, fechaoperacion, importeoperacion, estatus " .
-             " from movimientos where idcuentabancaria='$cBan' and referenciabancaria='$cRefe' and importeoperacion=$cImpo ";
+             " from $cTabla as movimientos where idcuentabancaria='$cBan' and referenciabancaria='$cRefe' and importeoperacion=$cImpo ";
     $aDat  = ejecutaSQL_($sql);
     return $aDat;
 }

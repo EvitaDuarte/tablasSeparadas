@@ -91,16 +91,21 @@ function crearDatosCuenta(cOpcion) {
 	    nombre 				: document.getElementById("nombre").value.trim().toUpperCase(),
 	    siglas 				: document.getElementById("siglas").value.trim().toUpperCase(),
 	    estatus 			: document.getElementById("estatus").checked,
-	    consecutivo			: 0
+	    consecutivo			: 0,
+	    concilia			: document.getElementById("concilia").checked,
+	    banco				: document.getElementById("idBanco").value
   	};
 }
 // ______________________________________________
 function validaDatosCuenta(aDatos){
 	var regreso = false;
 	if ( soloNumerosGuion(aDatos.idCuentaBancaria,"Cuenta Bancaria","idCuentaBancaria",lRequerido) ){
-		if (soloLetrasNumerosGuion(aDatos.nombre,"Nombre Cuenta","nombre",lRequerido)){
+		/*if (soloLetrasNumerosGuion(aDatos.nombre,"Nombre Cuenta","nombre",lRequerido)){*/
+		if ( soloCuenta(aDatos.nombre,"nombre",lRequerido)){
 			if (soloLetrasNumerosGuion(aDatos.siglas,"Siglas Cuenta","siglas",lRequerido)){
-				regreso = true;
+				if ( validarSeleccion( document.getElementById("idBanco") ) ){
+					regreso = true;
+				}
 			}
 		}
 	}
@@ -117,6 +122,7 @@ async function procesarRespuesta__(vRespuesta) {				// Define una promesa para e
             }else{
             	// document.getElementById("divBotones").style.display = "block";		// No se debería de dar, debio a que se debe cerrar sesión 
             }
+            await CargaBancos(vRespuesta.bancos);
         break;
         // ______________________________________________________________________
         case "AgregaCuentaBancaria": 													// Despues de insertar
@@ -190,11 +196,12 @@ function CargaCuentasBancarias(aRen){// aRen contiene todos los elementos que re
   		// Y ahora las celdas
   		var cell0 = row.insertCell(0); // celda para Cuenta 
   		var cell1 = row.insertCell(1); // Nombre
-  		var cell2 = row.insertCell(2); // Activo
-  		var cell3 = row.insertCell(3); // Usuario que da de alta
-  		var cell4 = row.insertCell(4); // Fecha de el alta
-  		var cell5 = row.insertCell(5); // Fecha de el alta
-  		var cell6 = row.insertCell(6); // Fecha de el alta
+  		var cell2 = row.insertCell(2); // Siglas
+  		var cell3 = row.insertCell(3); // Cuenta Activa
+  		var cell4 = row.insertCell(4); // Cuenta que se Concilia
+  		var cell5 = row.insertCell(5); // Banco
+  		var cell6 = row.insertCell(6); // Quien Captura
+  		var cell7 = row.insertCell(7); // Fecha Captura
 
 
   		// Asigna los valores de las propiedades a las celdas.
@@ -202,9 +209,10 @@ function CargaCuentasBancarias(aRen){// aRen contiene todos los elementos que re
 		cell1.innerHTML = item.nombre;
 		cell2.innerHTML = item.siglas;
 		cell3.innerHTML = item.estatus?"SI":"NO";
-		cell4.innerHTML = item.consecutivo;
-		cell5.innerHTML = item.usuarioalta;
-		cell6.innerHTML = item.fechaalta;
+		cell4.innerHTML = item.se_concilia?"SI":"NO";
+		cell5.innerHTML = item.banco;
+		cell6.innerHTML = item.usuarioalta;
+		cell7.innerHTML = item.fechaalta;
 	});
 
 	// Asigna escucha click a la tabla
@@ -223,12 +231,17 @@ function CargaCuentasBancarias(aRen){// aRen contiene todos los elementos que re
 			    document.getElementById("nombre").value 			= this.cells[1].textContent;
 			    document.getElementById("siglas").value 			= this.cells[2].textContent;
 			    document.getElementById("estatus").checked			= this.cells[3].textContent==="SI"?true:false;
+			    document.getElementById("concilia").checked			= this.cells[4].textContent==="SI"?true:false;
+			    document.getElementById("idBanco").value 			= buscaxNombre("idBanco",this.cells[5].textContent);
 		  	});
 		}
 
 	}
 }
 // _____________________________________________________________
+function CargaBancos(aRen){
+	llenaComboCveDes( document.getElementById("idBanco") , aRen 	);
+}
 // _____________________________________________________________
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *  *
 *                                                               *

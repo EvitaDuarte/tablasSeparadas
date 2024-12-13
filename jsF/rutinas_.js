@@ -211,7 +211,7 @@ function soloImportesPositivos(input,lValida=false){
 }
 // _________________________________
 function soloCuenta(cCampo,cHTML,lValida=false){
-    var patron = /^[a-zA-Z\s]+(?:\s-\s(?:\d{4}|\(\d{4}-\d{4}\)))?$/
+    var patron = /^[a-zA-ZñÑ\s]+(?:\s-\s(?:\d{4}|\(\d{4}-\d{4}\)))?$/
     cObj = document.getElementById(cHTML);
     cVar = cObj.value.trim();
     if (cVar===""){
@@ -602,7 +602,7 @@ function llenaComboCveDes(select,aCombo){ // llena un HTML Select (combobox) a p
     for (var i = 0; i < aCombo.length; i++) {
         var opcion   = document.createElement("option");
         opcion.text  = aCombo[i]["descripcion"].trim();  // Texto visible de la opción
-        opcion.value = aCombo[i]["clave"].trim(); // Valor de la opción (puede ser diferente del texto visible)
+        opcion.value = String(aCombo[i]["clave"]).trim(); // Valor de la opción (puede ser diferente del texto visible)
         select.appendChild(opcion); // Agrega la opción al select
     }
 }
@@ -1437,6 +1437,20 @@ const llenaFechaHoy = (cIdHtml,vHoy,lDiaIni=false) =>{
     }
 }
 // __________________________________________________________________________________
+const buscaxNombre = (cIdHtml,cNombre) =>{
+    var select = document.getElementById(cIdHtml);
+    cNombre    = cNombre.trim();
+
+    // Recorre las opciones para encontrar el texto que coincide con el nombre
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].text.trim() === cNombre) {
+          // Cambia la opción seleccionada por su índice
+          select.selectedIndex = i;
+          return select.options[i].value;
+        }
+    }
+    return "";
+}
 // __________________________________________________________________________________
 // __________________________________________________________________________________
 // __________________________________________________________________________________

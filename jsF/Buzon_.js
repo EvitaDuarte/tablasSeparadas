@@ -7,6 +7,8 @@
  *              entre JavaScript y PHP           *
  *              Unadm-Proyecto Terminal para INE *
  * * * * * * * * * * * * * * * * * * * * * * * * *
+ Columnas del buzon
+ Beneficiario	Importe		Concepto	Referencia		Documento	UR
 */
 
 var una_vez 	= true;			// Variable global para que algun proceso se ejecute solo una vez
@@ -74,6 +76,7 @@ function CargaCatalogos(aOpeCtrl,aCtaBan,cAnio,cAnioHoy,cHoy){
 		dHoy	= fgyyyyddmm(cHoy,"/");
 		// input date necesita valor en yyyy-mm-dd
 		document.querySelector("#idFechaMovs").value = dHoy; // fgyyyyddmm devuelve [2]-[1]-[0]
+		document.getElementById('idFechaMovs').setAttribute('max', dHoy);
 		// con sole.log(cAnio);
 	}
 
@@ -205,14 +208,6 @@ function procesarCSV(csvContent) {
 			tableBody.appendChild(filaHTML);
 		}
 	});
-	/* Se hace bolas con la búsqueda
-	var p = new Paginador(
-    	document.getElementById('paginador'), 				// div con botones 
-    	document.getElementById('buzon'), 					// tabla a paginar
-    	12 													// Número de renglones por página
-	);
-	p.Mostrar();
-	*/
 }
 // _______________________________________________
 function SegunColumnaNumerica(filas) {
@@ -236,7 +231,7 @@ function SegunColumnaNumerica(filas) {
 	        	lBien = false;
 	        }
 	    }
-	    1 +1;
+	    //1 +1;
     });
     return lBien
 }

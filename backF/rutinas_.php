@@ -267,4 +267,31 @@ function calculaTamanio($result){
     return $total_size;
 }
 // _____________________________________________________________________________
+function nombreTabla($cCtaBan){
+	return "atablas.t_" . trim($cCtaBan);
+}
+// _____________________________________________________________________________
+function tieneMovimientos($cCampo,$cValor,&$r){ // Revisa si existe información en todas las tablas del esquema atablas
+    $sql	= "select table_name from information_schema.tables where table_name like 't_%' and table_schema = 'atablas'";
+	$tablas = ejecutaSQL_($sql);
+
+    foreach ($tablas as $tabla) {
+        $tableName = $tabla['table_name'];
+        
+        // Construir la consulta dinámica para verificar el valor en el campo
+        $sql = "Select COUNT(*) as cantidad from atablas.$tableName where $cCampo = '$cValor'";
+        $reg = ejecutaSQL_($sql);
+        $r["tm"] = $sql;
+        $r["tm1"] = $reg;
+
+        if ( $reg[0]["cantidad"] > 0 ){
+        	return true; // Existe información
+        }
+        
+    }
+    return false;
+    
+}
+// _____________________________________________________________________________
+
 ?>
