@@ -34,6 +34,7 @@ private $folio;
 private $buzon_captura; 
 private $usuarioalta; 
 private $estatus;
+private $tabla;
 //	private $fechaalta;
 //	__________________________________________________________________________________________
 public function __construct($aDatos) {
@@ -55,6 +56,7 @@ public function __construct($aDatos) {
 		$this->usuarioalta			= pg_escape_string($aDatos["usuarioalta"]); 
 		$this->idmovimiento			= pg_escape_string($aDatos["idmovimiento"]);
 		$this->estatus				= pg_escape_string($aDatos["estatus"]);
+		$this->tabla 				= "atablas.t_" . trim($this->idcuentabancaria);
 		//$this->fechaalta			= pg_escape_string($aDatos[""]);
 	}
 }
@@ -112,24 +114,27 @@ function ActualizaMovimiento($conexion,$lAdiciona){
 	return $stmt->execute();
 }
 //	__________________________________________________________________________________________
-function traeMovimientoxId($conexion,$nId){
-	$sql = "select idcuentabancaria, idoperacion, idcontrol, idunidad, referenciabancaria, fechaoperacion," .
-		   "importeoperacion, beneficiario, concepto, anioejercicio, folio from movimientos " .
-		   "where idmovimiento=$nId";
+function traeMovimientoxId($conexion,$nId,$cCta){ // Se genera el objeto con null, por lo que tgis->idcuentabancaria no esta disponible
+	$cTabla = "atablas.t_" . trim($cCta);
+	$sql	= "select idcuentabancaria, idoperacion, idcontrol, idunidad, referenciabancaria, fechaoperacion," .
+		   	  "importeoperacion, beneficiario, concepto, anioejercicio, folio from $cTabla " .
+		   	  "where idmovimiento=$nId";
 	return ejecutaSQL_($sql);
 }
 //  __________________________________________________________________________________________
 function cancelaMovimiento($conexion,$cId){
-	$sql = "update movimientos set estatus='C', beneficiario = CONCAT('** CANCELADO ** ', beneficiario), " .
-		   "concepto =  CONCAT('** CANCELADO ** ', concepto) " .
-		   "where idmovimiento=$cId ";
+	$cTabla = $this->tabla;
+	$sql 	= "update $cTabla set estatus='C', beneficiario = CONCAT('** CANCELADO ** ', beneficiario), " .
+		   	  "concepto =  CONCAT('** CANCELADO ** ', concepto) " .
+		      "where idmovimiento=$cId ";
 	return ejecutaSQL_($sql);
 }
 //  __________________________________________________________________________________________
-function traeMovRefeImpo($cRefe,$cImpo){ // No se ha usado , quitar este comentario cuando se use
-	$cRefe = pg_escape_string($cRefe);
-	$cImpo = pg_escape_string($cImpo);
-	$sql   = "select idmovimiento from movimientos where referenciabancaria='$cRefe' and importeoperacion=$cImpo";
+function traeMovRefeImpo($cRefe,$cImpo,$cCta){ // No se ha USADO , quitar este comentario cuando se use
+	$cTabla = "atablas.t_" . trim($cCta);
+	$cRefe	= pg_escape_string($cRefe);
+	$cImpo	= pg_escape_string($cImpo);
+	$sql	= "select idmovimiento from $cTabla where referenciabancaria='$cRefe' and importeoperacion=$cImpo";
 
 	return ejecutaSQL_($sql);
 }

@@ -213,15 +213,13 @@ function procesarCSV(csvContent) {
 function SegunColumnaNumerica(filas) {
 	lBien = true;
 	i = 1;
-    //filas.every(fila => {
 	filas.forEach(fila => {
-    //for (let i = 0; i < filas.length; i++) {
-       // const fila = filas[i];
 		if (fila.length === 0 || fila.every(columna => columna.trim() === '')) {
 		}else{
 	        if (fila.length == 6) {
-	            valorSegundaColumna = fila[1].replace(/[ \t,"']/g, '').trim(); // Eliminar espacios, tabuladores, comas y comillas dobles
-	            esNumero = /^-?\d+(\.\d{2})?$/.test(valorSegundaColumna); // Aceptar números con dos dígitos decimales opcionales
+	        	valorSegundaColumna	= fila[1].toString().trim();
+	            valorSegundaColumna = valorSegundaColumna.replace(/[ \t,"']/g, '').trim(); // Eliminar espacios, tabuladores, comas y comillas dobles
+				esNumero = /^-?\d+(\.\d{1,2})?$/.test(valorSegundaColumna);		// Aceptar números con dos dígitos decimales opcionales, incluyendo enteros sin decimales
 	            if (!esNumero) {
 	            	//con sole.log ("No numérico "+valorSegundaColumna)
 	                lBien = false;
@@ -352,4 +350,138 @@ function BuzonMarcar() {
 		}
 	}	
 }
+// _______________________________________________
+const cargaArchivoXls = () =>{
+
+	var input1_file = document.getElementById('ArchivoCarga_file');
+	var oFile		= input1_file.files[0];
+	cFile 			= oFile.name;
+	const reader 	= new FileReader();
+	reader.onload = function (e) {
+		const xlsContent = e.target.result;
+		procesarXls(xlsContent);
+	};
+	reader.readAsArrayBuffer(oFile);
+}
+// _______________________________________________
+function procesarXls(xlsContent) {
+	const tableBody 	= document.getElementById('cuerpo'); // Asegúrate de tener un tbody en tu tabla HTML
+	tableBody.innerHTML = ''; // Limpia el contenido actual de la tabla
+
+	const workbook	= XLSX.read(xlsContent, { type: 'array' });
+    const sheetName	= workbook.SheetNames[0];
+    const sheet		= workbook.Sheets[sheetName];
+    const filas		= XLSX.utils.sheet_to_json(sheet, { header: 1 });     // Convierte la hoja a JSON
+    cMensaje		= "";
+    datos			= [];
+    //
+    if ( SegunColumnaNumerica(filas)==false ){
+    	cMensaje = "Error en el número de columnas o en el campo numérico";
+    	lValidar = false;
+    }else{
+    	lValidar = true;
+    }
+
+
+    cMensaje1 = ""
+	filas.forEach(function (cols) {
+		console.log("Cols<",cols,">"); //return false;
+		if (cols.length > 0 ){
+    		
+			cBenefi	= cols[0].toString().trim();	cImpo	= cols[1].toString().trim();
+			cCpto	= cols[2].toString().trim();	cRefe	= cols[3].toString().trim();
+			cDocto	= cols[4].toString().trim();	cUr		= cols[5].toString().trim();
+    		if (cBenefi.trim().length>150 ){
+    			if ( !cMensaje1.includes("Beneficiario") ){
+    				cMensaje1 = cMensaje1 + "Beneficiario(150), ";
+    			}
+    		}
+    		if (cCpto.trim().length>150){
+    			if ( !cMensaje1.includes("Concepto") ){
+    				cMensaje1 = cMensaje1 + "Concepto(150), ";
+    			}
+    		}
+    		if (cRefe.trim().length>20 ){
+    			if ( !cMensaje1.includes("Referencia") ){
+    				cMensaje1 = cMensaje1 + "Referencia(20), ";
+    			}
+    		}
+    		if ( cDocto.trim().length>20 ){
+    			if ( !cMensaje1.includes("Documento") ){
+    				cMensaje1 = cMensaje1 + "Documento(20), ";
+    			}  
+    		}
+    		if ( cUr.trim().length> 4){
+    			if ( !cMensaje1.includes("UR") ){
+    				cMensaje1 = cMensaje1 + "UR(4) [" + cUr + "]"; 
+    			}
+    		}
+    	}
+    });
+    if (cMensaje!="" || cMensaje1 !=""){
+    	lValidar = false;  
+    	if (cMensaje1!=""){
+    		cMensaje1 = "Los valores de "+cMensaje1+" exceden los límites"
+    	}
+    	mandaMensaje(cMensaje+" "+cMensaje1);
+    }
+	//
+	filas.forEach(function (cols) {				// Recorrer cada renglón del archivo CSV
+		if (cols.length > 0 ){
+			const celdas 	= cols;
+			const filaHTML	= document.createElement('tr');
+
+			celdas.forEach(function (celda,index) {
+				// Quita comillas que puedan venir en el archivo CSV, pero en el XLS tambien, creo que no ????
+				celda					= celda.toString().trim().toUpperCase(); // Si no marca error en los numéricos
+				celda 					= celda.replace(/"/g,'');
+				const celdaHTML 		= document.createElement('td');
+
+			    if (index === 1 && !isNaN(celda)) {
+			        // Convierte la celda en un número y formatea con comas
+			        celda = parseFloat(celda).toLocaleString('en-US');
+			    }
+				
+				celdaHTML.textContent 	= celda.trim(); 
+				filaHTML.appendChild(celdaHTML);
+			});
+
+	    	// Agrega un checkbox como celda
+	    	const celdaHTML			= document.createElement('td');
+		    const checkbox			= document.createElement('input');
+		    checkbox.type			= 'checkbox';
+	        checkbox.name 			= 'seleccion';
+	    	checkbox.checked 		= true
+	    	checkbox.style.display	= 'block';
+	    	checkbox.classList.add('mi-checkbox');
+		    celdaHTML.appendChild(checkbox);
+			filaHTML.appendChild(celdaHTML);
+
+			filaHTML.addEventListener("click", function() {
+		    	// Acción que deseas realizar cuando se haga clic en el renglón.
+		    	// Pasar los datos de la tabla a la zona de captura
+		    	document.getElementById("txtBeneficia").value	= filaHTML.cells[0].textContent;
+		    	document.getElementById("idImpo").value 		= filaHTML.cells[1].textContent;
+		    	document.getElementById("txtCpto").value		= filaHTML.cells[2].textContent;
+		    	document.getElementById("idRefe").value 		= filaHTML.cells[3].textContent;
+			    document.getElementById("idDocto").value 		= filaHTML.cells[4].textContent;
+			    document.getElementById("idUr").value			= filaHTML.cells[5].textContent;
+		  	});
+
+	    	// Agrega un botón como celda
+	    	/*
+	    	const celdaHTML1	= document.createElement('td');
+		    const boton			= document.createElement('input');
+		    boton.type			= 'button';
+		    boton.value 		= 'Elimina';
+		    boton.classList.add('mi-boton');
+		    celdaHTML1.appendChild(boton);
+			filaHTML.appendChild(celdaHTML1);
+			*/
+
+			tableBody.appendChild(filaHTML);
+		}
+	});
+}
+// _______________________________________________
 // _______________________________________________

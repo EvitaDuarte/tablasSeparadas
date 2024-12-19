@@ -44,7 +44,7 @@ protected $encodings;          // array of encodings
 protected $cmaps;              // array of ToUnicode CMaps
 protected $FontFamily;         // current font family
 protected $FontStyle;          // current font style
-protected $underline;          // underlining flag
+public    $underline;          // underlining flag
 protected $CurrentFont;        // current font info
 protected $FontSizePt;         // current font size in points
 protected $FontSize;           // current font size in user unit
@@ -57,11 +57,11 @@ protected $ws;                 // word spacing
 protected $images;             // array of used images
 protected $PageLinks;          // array of links in pages
 protected $links;              // array of internal links
-protected $AutoPageBreak;      // automatic page breaking
+public    $AutoPageBreak;      // automatic page breaking
 protected $PageBreakTrigger;   // threshold used to trigger page breaks
 protected $InHeader;           // flag set when processing header
 public    $InFooter;           // flag set when processing footer
-public	  $AliasNbPages;       // alias for total number of pages
+protected $AliasNbPages;       // alias for total number of pages
 protected $ZoomMode;           // zoom display mode
 protected $LayoutMode;         // layout display mode
 protected $metadata;           // document properties
@@ -985,6 +985,7 @@ function SetXY($x, $y)
 function Output($dest='', $name='', $isUTF8=false)
 {
 	// Output PDF to some destination
+	//$this->AliasNbPages = $this->PageNo();
 	$this->Close();
 	if(strlen($name)==1 && strlen($dest)!=1)
 	{
@@ -1557,7 +1558,7 @@ protected function _putpage($n)
 	$this->_put('endobj');
 	// Page content
 	if(!empty($this->AliasNbPages))
-		$this->pages[$n] = str_replace($this->AliasNbPages,$this->page,$this->pages[$n]);
+		$this->pages[$n] = str_replace($this->AliasNbPages,$this->page,$this->pages[$n]);// str_replace(busco,cambio,cadena_aModificar)
 	$this->_putstreamobject($this->pages[$n]);
 	// Link annotations
 	$this->_putlinks($n);

@@ -177,8 +177,8 @@ function ejecutaSQL_conn_pg($conn_pg,$sql){
 	return $regreso;
 }
 // _____________________________________________________________________________
-function conComas($cNumero,$nDeimal=2){
-	return number_format($cNumero, $nDeimal, '.', ',');
+function conComas($cNumero,$nDecimal=2){
+	return number_format($cNumero, $nDecimal, '.', ',');
 }
 // _____________________________________________________________________________
 function abreArchivoPdf($cArch){

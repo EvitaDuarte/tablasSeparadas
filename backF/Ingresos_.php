@@ -204,9 +204,10 @@ function EliminarMovimiento(&$respuesta){
 	$cCtaBan	= $respuesta["opcion"]["idCuentabancaria"];
 	$cTipoMov	= $respuesta["opcion"]["idTipo"];
 	$cOperacion	= $cTipoMov=="I"?"Ingreso":($cTipoMov=="E"?"Egreso":"Cheque");
+	$cOperacion.= "[" . $respuesta["opcion"]["opcion"] . "]";
 	try {
 		$conn_pdo->beginTransaction();
-		$elimina = metodos::EliminaMovimiento($cId);
+		$elimina = metodos::EliminaMovimiento($cId,$cCtaBan);
 		if ($elimina){
 			// Guarda la eliminación en la bitácora
 			bitacora($conn_pdo, $respuesta["datos"]["idUsuario"],$cCtaBan,"Eliminar $cOperacion","idOperacion: ".json_encode($respuesta["opcion"]),$nImpo);
@@ -498,9 +499,10 @@ function cancelaMovsCorrectos(&$respuesta){
 	foreach($aMovsCance as $aCance){
 		if ($aCance["estatus"]==""){
 //
-			$aMovOri								 = $oMov->traeMovimientoxId($conn_pdo,$aCance["idMov"])[0];
+			$cCta									 = trim($opcion["ctBancaria"]);
+			$aMovOri								 = $oMov->traeMovimientoxId($conn_pdo,$aCance["idMov"],$cCta)[0];
 //
-			$respuesta["opcion"]["idCuentabancaria"] = $opcion["ctBancaria"];
+			$respuesta["opcion"]["idCuentabancaria"] = $cCta;
 			$respuesta["opcion"]["idOpera"] 		 = $aMovOri["idoperacion"]; // $opcion["opeCan"];
 			$respuesta["opcion"]["idCtrl"] 			 = $aMovOri["idcontrol"];
 			$respuesta["opcion"]["idRefe"]		 	 = $aCance["referencia"];
@@ -577,6 +579,7 @@ function movsCanceIncorrectos(&$respuesta){
 }
 // __________________________________________________________________________________
 function EliminarLayOut(&$respuesta){
+	$respuesta["pasos"] = "[Entro a EliminarLayOut]";
 	movsEliminaCorrectos($respuesta);
 	$nMovsTot   	 = count($respuesta["opcion"]["aDatosEli"]);
 	$nMovsEliminados = EliminaMovsCorrectos($respuesta);
@@ -588,6 +591,7 @@ function EliminarLayOut(&$respuesta){
 }
 // __________________________________________________________________________________
 function EliminaMovsCorrectos(&$respuesta){
+	$respuesta["pasos"] .= "[Entro a EliminaMovsCorrectos]";
 	$aMovsEli		 = $respuesta["opcion"]["aDatosEli"];
 	$nMovsEliminados = 0;
 
@@ -607,6 +611,7 @@ function EliminaMovsCorrectos(&$respuesta){
 }
 // __________________________________________________________________________________
 function movsEliminaCorrectos(&$respuesta){
+	$respuesta["pasos"] .= "[Entro a movsEliminaCorrectos]";
 
 	$aMovsEli	= $respuesta["opcion"]["aDatosEli"];
 	$cCtaBan	= $respuesta["opcion"]["idCuentabancaria"];
@@ -628,6 +633,7 @@ function movsEliminaCorrectos(&$respuesta){
 			$respuesta["_trace"] .= " busco importe $impoTxt";
 		}else{
 			$aMov = metodos::revisaReferenciaBancaria($cRefBan,$cCtaBan);
+			$respuesta["_trace"] .= " busco referencia [$cRefBan][$cCtaBan]";
 		}
 		
 		if (!empty($aMov)) {
@@ -650,6 +656,8 @@ function movsEliminaCorrectos(&$respuesta){
 	        				}else{ // Años Anteriores
 	        					$respuesta["opcion"]["aDatosEli"][$i]["estatus"] = "Fecha de días o años anteriores";
 	        				}
+	        			}else{
+	        				$respuesta["error"] = "No es administrador";
 	        			}
 	        		}else if($fechaMov==$cHoy){
 	        			$lOk = true;

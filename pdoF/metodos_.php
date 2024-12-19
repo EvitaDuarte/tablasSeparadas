@@ -143,10 +143,11 @@ public static function ReciboIngreso(&$respuesta){
 
 }
 //  _______________________________________________________________________________________________
-public static function EliminaMovimiento($cId){
+public static function EliminaMovimiento($cId,$cCta){
     //$cId  = "8888888";
-    $sql  = "delete from movimientos where idmovimiento=$cId";
-    $res  = actualizaSql($sql);
+    $cTabla = "atablas.t_" . trim($cCta);
+    $sql    = "delete from $cTabla where idmovimiento=$cId";
+    $res    = actualizaSql($sql);
     return ($res>0); // true si se elimino 
 }
 //  _______________________________________________________________________________________________

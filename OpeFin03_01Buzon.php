@@ -24,7 +24,8 @@
                             <div class="wrapper">
                                 <section class="seccion_caja" id="captura">
                                     <div class="caja_captura boton">
-                                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".csv,.CSV">
+                                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" 
+                                        class="inputF-file1" accept=".csv,.CSV,.xlsx,.XLSX,.xls,.XLS">
                                         <label for="ArchivoCarga_file" class="inputF-label1" id="lblCarga">
                                             <i class="large material-icons space" id="input_icon">add_to_photos</i>
                                             <span id="input_text">
@@ -130,8 +131,9 @@
         <script src="jsF/cerrarSesion_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Buzon_.js"></script>
+        <script src="assetsF/js/xlsx.mini.min.js"></script>
         <script type="text/javascript">
-            efectoBotones("Buzon"); // Cambia el titulo del boton de carga de archivo CSV
+            efectoBotones("BuzonXls"); // Cambia el titulo del boton de carga de archivo CSV para llamar cargaArchivoCsv desde rutinas_.js
         </script>
     </body>
 </html>

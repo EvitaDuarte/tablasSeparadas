@@ -215,7 +215,7 @@ function realizaConciliacion(&$respuesta){
 						$aDatos["concepto"]			 = $aDatos["concepto"] . "|" . $nId;
 						$aDatos["idmovimiento"]		 = $nId;
 						// Concilia en la tabla de MOVIMIENTOS
-						if ( $oMovConci->conciliaMovConciliacion($nId,$cFechConci,"S")<1 ){
+						if ( $oMovConci->conciliaMovConciliacion($nId,$cFechConci,"S",$cCta)<1 ){
 							$respuesta["mensaje"] = "Excepción con $nId $cFechaConci 'S' en los movimientos";
 							$conn_pdo->rollBack();
 							return false;

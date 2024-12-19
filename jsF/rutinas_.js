@@ -1245,6 +1245,8 @@ function efectoBotones(cOpc){
                 inputLabel.setAttribute('title', full_name);        // Guarda toda la ruta ?
                 if (cOpc=="Buzon"){
                     cargaArchivoCsv()
+                }else if(cOpc=="BuzonXls"){
+                    cargaArchivoXls()
                 }else if(cOpc==""){
 
                 }
@@ -1452,5 +1454,28 @@ const buscaxNombre = (cIdHtml,cNombre) =>{
     return "";
 }
 // __________________________________________________________________________________
+const fechaXLS = (cFechaNumero,cSeparador="-") =>{ // Regresa la fecha, de acuerdo con un valor numérico
+
+    if (cFechaNumero && !isNaN(cFechaNumero)) {
+        // Convertir el número de Excel (por ejemplo, 45643) a una fecha en formato dd/mm/yyyy
+        let fechaExcel = new Date(1900, 0, cFechaNumero - 1);   // 1 de enero de 1900 es la fecha base de Excel
+        fechaExcel.setDate(fechaExcel.getDate() );              // tenia un +1 pero adelantaba un día Ajustar debido a que Excel tiene un error con el 1900
+
+        // Obtener el día, mes y año con formato dd/mm/yyyy
+        let dia = String(fechaExcel.getDate()).padStart(2, '0');
+        let mes = String(fechaExcel.getMonth() + 1).padStart(2, '0'); // Los meses en JavaScript son 0-indexados
+        let anio = fechaExcel.getFullYear();
+
+        let fechaFormateada = `${anio}${cSeparador}${mes}${cSeparador}${dia}`;
+        console.log("Fecha Formateada: ",cFechaNumero,"->" ,fechaFormateada);
+
+        // Asigna la fecha formateada a la variable cFecha
+        cFechaNumero = fechaFormateada;
+        return cFechaNumero;
+    }else{
+        return "";
+    }    
+
+}
 // __________________________________________________________________________________
 // __________________________________________________________________________________

@@ -527,16 +527,17 @@ function EstadoCuenta(&$res){
 	try {
 		metodos::SaldoAnterior($res); // lo guarda en $res["datos"]["saldoAnterior"], se requiere porpiedades cCta y cFecha
 		// ini_set('memory_limit', '1G'); // Aumenta a 1 GB
-		$cCta = $res["datos"]["cCta"];
-		$fecI = $res["datos"]["fechaI"];
-		$fecF = $res["datos"]["fechaF"];
-		$cSal = $res["datos"]["salida"];
-		$sql  =	"select a.fechaoperacion, a.referenciabancaria, a.folio, a.idoperacion, a.idcontrol, " . 
-				" a.beneficiario, a.concepto, a.importeoperacion, b.tipo, a.idunidad " . 
-				" from movimientos a, operacionesbancarias b ". 
-				" where a.idoperacion=b.idoperacion and a.idcuentabancaria='$cCta' and " .
-				" fechaoperacion>='$fecI' and fechaoperacion<='$fecF' " .
-				" order by a.fechaoperacion, b.tipo desc";
+		$cCta	= $res["datos"]["cCta"];
+		$fecI	= $res["datos"]["fechaI"];
+		$fecF	= $res["datos"]["fechaF"];
+		$cSal	= $res["datos"]["salida"];
+		$cTabla = "atablas.t_" . trim($cCta);
+		$sql	=	"select a.fechaoperacion, a.referenciabancaria, a.folio, a.idoperacion, a.idcontrol, " . 
+					" a.beneficiario, a.concepto, a.importeoperacion, b.tipo, a.idunidad " . 
+					" from $cTabla a, operacionesbancarias b ". 
+					" where a.idoperacion=b.idoperacion and a.idcuentabancaria='$cCta' and " .
+					" fechaoperacion>='$fecI' and fechaoperacion<='$fecF' " .
+					" order by a.fechaoperacion, b.tipo desc";
 		$res["_trace"] = $sql;
 	
 		$aVal = ejecutaSQL_($sql);

@@ -103,6 +103,8 @@
                                             <option value="">Seleccione</option>
                                             <option value="Eliminar">Eliminar</option>
                                             <option value="Cancelar">Cancelar</option>
+                                            <option value="EliXls">Eliminar XLS</option>
+                                            <option value="CanceXls">Cancelar XLS</option>
                                         </select>
                                     </div>
                                     <div class="caja_captura"></div>
@@ -254,7 +256,7 @@
                 <hr>
                 <div class="dialogo_body">
                     <div class="caja_captura">
-                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT" onchange="ponArchivoCarga();">
+                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT,.xlsx,.xls" onchange="ponArchivoCarga();">
                         <label for="ArchivoCarga_file" class="inputF-label1" id="lblCarga">
                             <i class="large material-icons space" id="input_icon">&#10697;</i>
                             <span id="input_text">
@@ -274,4 +276,5 @@
         <script src="jsF/numeroletras_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Ingresos_.js"></script>
+        <script src="assetsF/js/xlsx.mini.min.js"></script>
 </html>

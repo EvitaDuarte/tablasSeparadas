@@ -16,7 +16,7 @@ var cYear		 = "";				// Mínimo año a capturar
 var cAnioRei	 = "";				// Mínimo año para los reintegros
 var cAnio 		 = "";				// Año que regresa de la fecha actual del Servidor
 var dHoy		 = "";				// Fecha del servidor
-var cEsquema	 = "";				// Rol del Usuario
+var gEsquema	 = "";				// Rol del Usuario
 var lActiva		 = null;				// Para saber si la cuenta Bancaria esta Activa
 var pagCta		 = "";				// Guarda la cuenta Bancaria para el paginado
 var nSaldoCta    = 0.00;
@@ -611,7 +611,7 @@ function ConsultaMovimientosBancarios(aRespuesta){ // Es el regreso del PHP
 				    }else{
 				    	// Si no es administrador no podrá cancelar, modificar, eliminar un movimiento
 				    	if ( cFechaCap < dHoy ){
-							if (cEsquema!="Administrador"){
+							if (gEsquema!="Administrador"){
 								document.getElementById("idEstatus").value = "NM";
 								lDiaAnterior = true;
 							}
@@ -643,7 +643,7 @@ function CargaCatalogos(vRes){
 	cYear	 = vRes.opcion.anio;
 	dHoy	 = vRes.opcion.hoy;
 	cAnio	 = dHoy.split("-")[0]; 
-	cEsquema = vRes.datos.esquemaUsuario;
+	gEsquema = vRes.datos.esquemaUsuario;
 	if (vRes.ctas!=null){	// Puede venir nula si no se han asignado cuentas al usuario
 		llenaCombo( document.getElementById("idCuentabancaria") , vRes.ctas 	);
 	}else{
@@ -740,7 +740,7 @@ function verificaIdMov(cOpcion,cId,lVerifcaAdmin){
 	if (lVerifcaAdmin){
 		// Solo el administrador puede eliminar/cancelar movimientos de días anteriores
 		if (cFechaCap<cFechaHoy){
-			if (cEsquema!="Administrador"){
+			if (gEsquema!="Administrador"){
 				mandaMensaje(`No se pueden ${cOpcion} ${gOperacion}s de días anteriores`);
 				return false;
 			}
@@ -795,7 +795,18 @@ function archivoLayOut(cValor,cTipMov){
 		cOpc   = "C";
 		document.getElementById("input_text").textContent = "Seleccione Archivo de Cancelación";
 		document.getElementById("btn_text").textContent   = "Iniciar Cancelación";
+	}else if (cValor=="EliXls"){
+		cValor = "eliminaciónXls"
+		cOpc   = "EX";
+	    document.getElementById("input_text").textContent = "Seleccione Archivo de Eliminación XLS";
+	    document.getElementById("btn_text").textContent   = "Iniciar Eliminación XLS";
+	}else if (cValor=="CanceXls"){
+		cValor = "cancelaciónXls"
+		cOpc   = "CX";
+	    document.getElementById("input_text").textContent = "Seleccione Archivo de Cancelación XLS";
+	    document.getElementById("btn_text").textContent   = "Iniciar Cancelación XLS";
 	}
+
 	// Solicita archivo de layOut
 	solicitaArchivoLayOut().then((respuesta) => {
 		if (respuesta){
@@ -812,9 +823,17 @@ function archivoLayOut(cValor,cTipMov){
 							procesarCSVCancelacion(csvContent,cTipMov);
 						}else if(cOpc==="E"){
 							procesarCSVEliminar(csvContent,cTipMov);
+						}else if(cOpc=="EX"){
+							procesarXlsEliminar(csvContent,cTipMov);
+						}else if (cOpc=="CX"){
+							procesarXlsCancelacion(csvContent,cTipMov);
 						}
 					};
-					reader.readAsText(oFile, 'UTF-8');
+					if (cOpc=="C" || cOpc=="E"){
+						reader.readAsText(oFile, 'UTF-8');
+					}else if (cOpc=="EX" || cOpc=="CX"){
+						reader.readAsArrayBuffer(oFile);
+					}
 				}
 			});
 
@@ -942,7 +961,7 @@ function procesarCSVEliminar(csvContent,cTipMov){
 			idCuentabancaria	: regresaCuentaBancaria(),
 			opeEli				: cTipMov,
 			idTipo				: gTipoMov,
-			esquema				: cEsquema,
+			esquema				: gEsquema,
 			aDatosEli			: datos
 		}
 		// Valida que los datos esten completos
@@ -1069,4 +1088,137 @@ const validaCheImp = (lMensaje) => {
 
 //}
 // __________________________________________________________________________________
+const procesarXlsEliminar = (xlsContent,cTipMov)=>{
+
+	const workbook	= XLSX.read(xlsContent, { type: 'array' });
+    const sheetName	= workbook.SheetNames[0];
+    const sheet		= workbook.Sheets[sheetName];
+    const json 		= XLSX.utils.sheet_to_json(sheet, { header: 1 });     // Convierte la hoja a JSON
+    lMalNumero		= false
+    cMensaje		= "";
+    datos			= [];
+
+    json.forEach(cols => {
+    	cRefe = cols[0].toString().trim();
+    	cImpo = cols[1].toString().trim();
+    	cBene = cols[2].toString().trim();
+    	console.log(cRefe,cImpo,cBene);
+		cImpo = cImpo.replace(/[ \t,"']/g, '').trim(); 
+		esNumero = /^-?\d+(\.\d{1,2})?$/.test(cImpo); // Aceptar números con dos dígitos decimales opcionales, incluyendo enteros sin decimales
+        if (!esNumero) {
+            lMalNumero = true;
+        }else{
+        	// En cheques Pasar beneficiario si número de cheque ==="00000000" isNaN ( is Not a Number)
+        	cImpo  = parseFloat(cImpo).toFixed(2).toString(); // En php la BD regresa a dos decimales incluyendo los importes enteros
+        	cBene1 = ( (gTipoMov=="C" && !isNaN(cRefe) && parseInt(cRefe)===0) ? cBene : "" );
+            var filaDatos = {
+        		referencia	: cRefe,
+        		importe		: cImpo,
+        		estatus		: "",
+        		idMov		: "",
+        		beneficiario: cBene1
+         	};
+        	// Agrega el objeto al arreglo de datos seleccionados
+			datos.push(filaDatos);
+        }
+    });
+	if (lMalNumero){
+		mandaMensaje("Se requiere revisar los importes del archivo XLSX ["+cImpo+"]");
+		return false;
+	}
+	if (datos.length>0){
+		aDatos ={
+			opcion				: "EliminarLayOut",
+			idCuentabancaria	: regresaCuentaBancaria(),
+			opeEli				: cTipMov,
+			idTipo				: gTipoMov,
+			esquema				: gEsquema,
+			aDatosEli			: datos
+		}
+		// Valida que los datos esten completos
+		conectayEjecutaPost(aDatos,cPhp);
+	}else{
+		mandaMensaje("No se logró procesar archivo XLSX");
+	}
+}
+// __________________________________________________________________________________
+const procesarXlsCancelacion = (xlsContent,cTipMov)=>{
+	var lMalFecha	= false ,lMalNumero=false , lMalCheque=false;
+	const workbook	= XLSX.read(xlsContent, { type: 'array' });
+    const sheetName	= workbook.SheetNames[0];
+    const sheet		= workbook.Sheets[sheetName];
+    const filas		= XLSX.utils.sheet_to_json(sheet, { header: 1 });     // Convierte la hoja a JSON
+    cMensaje		= "";
+    datos			= [];
+    //
+	filas.forEach(function (cols) {
+		console.log("Cols<",cols,">"); //return false;
+		if (cols.length > 0 ){
+			cRefe	= cols[0].toString().trim();
+			cFecha	= cols[1].toString().trim();
+			cImpo	= cols[2].toString().trim();
+			// fddmmyyyy puede cambiar de d/m/y  a y/m/d   o   de y/m/d  a d/m/y
+			//cFecha1 = fgyyyyddmm(cFecha,"/"); cAnio = cFecha1.substring(0,4);
+			//con sole.log(`cRefe=${cRefe} cFecha=${cFecha1} Año=${cAnio} cImpo=${cImpo}`);
+			cFecha1 = fechaXLS(cFecha); cAnio = cFecha1.substring(0,4);
+			if(cFecha1==""){
+				lMalFecha = true;
+			}else{
+				if (cFecha1 > dHoy || ( (cYear-cAnio)>4 ) ){
+					lMalFecha = true;
+				}
+			}
+			cImpo	 = cImpo.replace(/[ \t,"']/g, '').trim();  
+			esNumero = /^-?\d+(\.\d{1,2})?$/.test(cImpo); // Aceptar números con dos dígitos decimales opcionales, incluyendo enteros sin decimales
+            if (!esNumero) {
+                lMalNumero = true;
+            }
+            if ( cTipMov==="Che" && parseInt(cRefe)===0 ){
+            	lMalCheque = true;
+            }
+			cImpo1  = parseFloat(cImpo).toFixed(2).toString(); // En php la BD regresa a dos decimales incluyendo los importes enteros
+            var filaDatos = {
+            	referencia	: cRefe,
+            	fechaCance	: cFecha1,
+            	importe		: cImpo1,
+            	estatus		: "",
+            	idMov		: ""
+             };
+            // Agrega el objeto al arreglo de datos seleccionados
+			datos.push(filaDatos);
+		}
+	});
+	console.log("Datos:",datos);
+	if (lMalFecha){
+		cMensaje = "Fechas de Cancelación";
+	}
+	if (lMalNumero){
+		if (cMensaje!==""){
+			cMensaje = cMensaje + ", ";
+		}
+		cMensaje = cMensaje + "Importes"
+	}
+	if (lMalCheque){
+		if (cMensaje!==""){
+			cMensaje = cMensaje + ", ";
+		}
+		cMensaje = cMensaje + "Números de Cheque"
+	}
+	//**
+	if (cMensaje!==""){
+		cMensaje  = " Inconsistencias en "+ cMensaje + "... revise archivo XLS"
+		mandaMensaje(cMensaje);
+		return false;
+	}
+	aDatos ={
+		opcion		: "CancelarLayOut",
+		ctBancaria	: regresaCuentaBancaria(),
+		opeCan		: cTipMov,
+		idTipo		: gTipoMov,
+		aDatoCance	: datos
+	}
+	// Valida que los datos esten completos
+	conectayEjecutaPost(aDatos,cPhp);
+    //
+}
 // __________________________________________________________________________________

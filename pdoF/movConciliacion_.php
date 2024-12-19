@@ -9,13 +9,13 @@
 *               buzón de la BD del Sistema      *
 *               Unadm-Proyecto Terminal         *
 * * * * * * * * * * * * * * * * * * * * * * * * *  
-	Clase para manejar objetos para la Tabla de Conciliacion movimientos
+	Clase para manejar objetos para la Tabla de Conciliacion movi-mientos
  */
 // Comentar  para producción
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// El php que invoca a Movimientos.php debe llamar a rutinas.php y metodos.php
+// El php que invoca a Movimi-entos.php debe llamar a rutinas.php y metodos.php
 // require_once '../backF/rutinas_.php';
 // require_once "metodos.php";
 class movConciliacion{
@@ -260,7 +260,7 @@ function movimientosBanco($cCta, $cFecha, &$cRegreso){
 	$resultado	=  $stmt->execute();
 	if ($resultado==true){
 		$resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($resultado)) { // No hay movimientos
+        if (empty($resultado)) { // No hay movi-mientos
         	$cRegreso = array();
             return false;
 		}else{
@@ -373,7 +373,8 @@ function ConciliaMovBanco($cCta,$cId,$cStatus,$cFecConci,&$cRegreso){
 // _______________________________________________________________________________	
 function buscaReferenciaMovimientos($cCta,$cRefe,$nImpo){
 	try {
-		$sql	= "select idmovimiento from movimientos where " . 
+		$cTabla = "atablas.t_" . trim($cCta);
+		$sql	= "select idmovimiento from $cTabla where " . 
 				  "idcuentabancaria=:cuenta and referenciabancaria=:referencia and  importeoperacion=:importe " . 
 				  "order by idmovimiento";
 		$stmt	= $this->conexion->prepare($sql);
@@ -404,11 +405,12 @@ function buscaReferenciaMovimientos($cCta,$cRefe,$nImpo){
 } 
 // _______________________________________________________________________________
 // Esta se usa para conciliacion por layout, ya que existe una para movs individuales ( conciliaMovimiento )
-function conciliaMovConciliacion($idMov,$fecha,$cEstatus){ 
+function conciliaMovConciliacion($idMov,$fecha,$cEstatus,$cCta){ 
 	try {
 		//$sql	= "update conci_movimientos set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado 
 		//where id_concimovimiento=:id_concimovimiento ";
-		$sql	= "update movimientos set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado where idmovimiento=:idMov ";
+		$cTabla = "atablas.t_" . trim($cCta);
+		$sql	= "update $cTabla set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado where idmovimiento=:idMov ";
 		$stmt	= $this->conexion->prepare($sql);
 		//
 		$stmt->bindParam(':idMov'			    , $idMov		, PDO::PARAM_STR);
@@ -427,29 +429,6 @@ function conciliaMovConciliacion($idMov,$fecha,$cEstatus){
 	}
 }	
 // _______________________________________________________________________________ 
-/* Es igual a conciliaMovConciliacion y a conciliaMovimiento
-function conciliaMovIngEgrChe($idmov,$fecha,$cEstatus){
-	try {
-		$sql	= "update movimientos set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado where idmovimiento=:id_mov ";
-		$stmt	= $this->conexion->prepare($sql);
-
-		$stmt->bindParam(':fechaconciliacion'	, $fecha		, PDO::PARAM_STR);
-		$stmt->bindParam(':conciliado'			, $cEstatus		, PDO::PARAM_STR);
-		$stmt->bindParam(':id_mov'				, $idMov		, PDO::PARAM_STR);
-
-
-		$resultado = $stmt->execute();
-		
-		if ($resultado === true) {
-			return true; // Update exitoso
-		} else {
-			return false; // Error al ejecutar el update
-		}
-	} catch (PDOException $e) {
-		return "c) Error : " . $e->getMessage();
-	}	
-}	
-*/
 // _______________________________________________________________________________	
 function traeSaldoINE($cCta,$cFecha,&$cRegreso){
 	$cRegreso 	= "";
@@ -481,9 +460,10 @@ function traeSaldoINE($cCta,$cFecha,&$cRegreso){
 // _______________________________________________________________________________	
 function movimientosIne($cCta, $cFecha, &$cRegreso){
 	$cRegreso = "";
+	$cTabla   = "atablas.t_" . trim($cCta);
 
 	$sql = 	"select a.idcuentabancaria, b.tipo , a.beneficiario, a.concepto, a.importeoperacion, a.referenciabancaria, a.fechaoperacion, " . 
-			"a.fechaconciliacion, a.conciliado from movimientos a , operacionesbancarias b " .
+			"a.fechaconciliacion, a.conciliado from $cTabla a , operacionesbancarias b " .
 			"where a.idoperacion=b.idoperacion and  idcuentabancaria='$cCta' and fechaoperacion<='$cFecha' and " .
 			"(  (  not conciliado='S'  ) or ( conciliado='S' and fechaconciliacion > '$cFecha' )  ) ".
 			"order by fechaoperacion, b.tipo desc ";
@@ -492,7 +472,7 @@ function movimientosIne($cCta, $cFecha, &$cRegreso){
 	$resultado	=  $stmt->execute();
 	if ($resultado==true){
 		$resultado = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        if (empty($resultado)) { // No hay movimientos
+        if (empty($resultado)) { // No hay movi-mientos
         	$cRegreso = array();
             return false;
 		}else{
@@ -509,7 +489,8 @@ function conciliaMovimiento($cCta,$fecha,$idMov,$cEstatus,&$cRegreso){
 	try {
 		//$sql	= "update conci_movimientos set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado 
 		// where id_concimovimiento=:id_concimovimiento ";
-		$sql	= "update movimientos set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado " .
+		$cTabla = "atablas.t_" . trim($cCta);
+		$sql	= "update $cTabla set fechaconciliacion=:fechaconciliacion, conciliado=:conciliado " .
 				  "where idmovimiento=:idMov and idcuentabancaria=:cuenta";
 		$stmt	= $this->conexion->prepare($sql);
 		//

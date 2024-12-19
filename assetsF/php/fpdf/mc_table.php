@@ -52,7 +52,7 @@ class PDF_MC_Table extends FPDF
     function RecuperaX(){ // Se debio guardar primero x y y con GuardaXY
         return $this->_x_;
     }
-    
+    // _________________________________________________________
     function Row($data,$_color_){
         // Calculate the height of the row
         $nb = 0;
@@ -75,6 +75,39 @@ class PDF_MC_Table extends FPDF
                 $this->Rect($x,$y,$w,$h,'F');// Con relleno cremosito
             }
             $this->Rect($x,$y,$w,$h);
+            // Print the text
+            $this->MultiCell($w,$this->linespace,$data[$i],0,$a);
+            // Put the position to the right of the cell
+            $this->SetXY($x+$w,$y);
+        }
+        // Go to the next line
+        $this->Ln($h);
+    }
+    // _________________________________________________________
+    function RowCuadro($data,$_color_){
+        // Calculate the height of the row
+        $nb = 0;
+        for($i=0;$i<count($data);$i++)
+            $nb = max($nb,$this->NbLines($this->widths[$i],$data[$i]));
+        $h = ($this->linespace)*$nb;
+        // Issue a page break first if needed
+        $this->CheckPageBreak($h);
+        // Draw the cells of the row
+        for($i=0;$i<count($data);$i++)
+        {
+            $w = $this->widths[$i];
+            $a = isset($this->aligns[$i]) ? $this->aligns[$i] : 'L';
+            // Save the current position
+            $x = $this->GetX();
+            $y = $this->GetY();
+            // Draw the border
+            if ( isset($_color_) && $_color_ !== null ){
+                $this->SetFillColor($_color_[0],$_color_[1],$_color_[2]);
+                $this->Rect($x,$y,$w,$h,'F');// Con relleno cremosito
+            }
+            if (trim($data[$i])!==""){
+                $this->Rect($x,$y,$w,$h);
+            }
             // Print the text
             $this->MultiCell($w,$this->linespace,$data[$i],0,$a);
             // Put the position to the right of the cell
