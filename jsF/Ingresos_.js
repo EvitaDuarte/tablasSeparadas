@@ -1102,7 +1102,7 @@ const procesarXlsEliminar = (xlsContent,cTipMov)=>{
     	cRefe = cols[0].toString().trim();
     	cImpo = cols[1].toString().trim();
     	cBene = cols[2].toString().trim();
-    	console.log(cRefe,cImpo,cBene);
+    	//console.log(cRefe,cImpo,cBene);
 		cImpo = cImpo.replace(/[ \t,"']/g, '').trim(); 
 		esNumero = /^-?\d+(\.\d{1,2})?$/.test(cImpo); // Aceptar números con dos dígitos decimales opcionales, incluyendo enteros sin decimales
         if (!esNumero) {
@@ -1152,7 +1152,7 @@ const procesarXlsCancelacion = (xlsContent,cTipMov)=>{
     datos			= [];
     //
 	filas.forEach(function (cols) {
-		console.log("Cols<",cols,">"); //return false;
+		//console.log("Cols<",cols,">"); //return false;
 		if (cols.length > 0 ){
 			cRefe	= cols[0].toString().trim();
 			cFecha	= cols[1].toString().trim();
@@ -1163,10 +1163,11 @@ const procesarXlsCancelacion = (xlsContent,cTipMov)=>{
 			cFecha1 = fechaXLS(cFecha); cAnio = cFecha1.substring(0,4);
 			if(cFecha1==""){
 				lMalFecha = true;
-			}else{
+			}else{ // En JS no se puede validar si el registro XLS tiene fecha menor al mov en la base de Datos
 				if (cFecha1 > dHoy || ( (cYear-cAnio)>4 ) ){
 					lMalFecha = true;
 				}
+				//console.log("Fecha",cFecha1,"Hoy",dHoy,"F>Hoy?",cFecha1 > dHoy);
 			}
 			cImpo	 = cImpo.replace(/[ \t,"']/g, '').trim();  
 			esNumero = /^-?\d+(\.\d{1,2})?$/.test(cImpo); // Aceptar números con dos dígitos decimales opcionales, incluyendo enteros sin decimales
@@ -1188,7 +1189,7 @@ const procesarXlsCancelacion = (xlsContent,cTipMov)=>{
 			datos.push(filaDatos);
 		}
 	});
-	console.log("Datos:",datos);
+	//console.log("Datos:",datos);
 	if (lMalFecha){
 		cMensaje = "Fechas de Cancelación";
 	}

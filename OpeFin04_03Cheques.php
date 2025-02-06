@@ -10,7 +10,7 @@
         <!-------------General Style's--------------->
         <link rel="stylesheet" href="assetsF/css/panel_style.css">
         <link rel="stylesheet" href="assetsF/css/seccion.css">
-        <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
 
@@ -101,6 +101,8 @@
                                             <option value="">Seleccione</option>
                                             <option value="Eliminar">Eliminar</option>
                                             <option value="Cancelar">Cancelar</option>
+                                            <option value="EliXls">Eliminar XLS</option>
+                                            <option value="CanceXls">Cancelar XLS</option>
                                         </select>
                                     </div>
                                     <div class="caja_captura"></div>
@@ -246,7 +248,7 @@
                 <hr>
                 <div class="dialogo_body">
                     <div class="caja_captura">
-                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT" onchange="ponArchivoCarga();">
+                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT,.xlsx,.XLSX,.xls,.XLS" onchange="ponArchivoCarga();">
                         <label for="ArchivoCarga_file" class="inputF-label1" id="lblCarga">
                             <i class="large material-icons space" id="input_icon">&#10697;</i>
                             <span id="input_text">
@@ -282,8 +284,6 @@
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/numeroletras_.js"></script>
         <script src="jsF/Ingresos_.js"></script>
-        <script type="text/javascript">
-            // efectoBotones();  // Para que cambie de color cuando pase el cursor el usuario
-        </script>
+        <script src="assetsF/js/xlsx.mini.min.js"></script>
     </body>
 </html>

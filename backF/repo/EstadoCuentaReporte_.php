@@ -4,6 +4,9 @@ require('../assetsF/php/fpdf/mc_table.php');
  // ___________________________________________________________________________
 
 function pdfEstadoCuenta(&$res){
+    // Globales
+    global $aAnchos;
+    $aAnchos = array(30, 80,75,26);
 	//
     try {
         $cFecIni = date("d-m-Y", strtotime($res["datos"]["fechaI"]) );

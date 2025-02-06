@@ -35,5 +35,6 @@
         $usrEsquema   = $_SESSION['OpeFinEsquema'];
         $v_TituloS    = $_SESSION['OpeFinTituloS'];
         $v_Error      = $_SESSION['OpeFinError'];
+        $v_Alias      = $_SESSION['alias'];
     }
 ?>

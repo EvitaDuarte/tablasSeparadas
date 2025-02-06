@@ -62,6 +62,18 @@
                                     </div>
                                 </section>
 <!-- 							_______________________________________________________________________________					-->
+                                <section class="seccion_caja_despliegue_70" id="cuadricula">
+                                    <div class="tabla-con-cuadricula">
+                                        <table class="tablex" id="tablaVacia">
+                                            <thead>
+                                                <tr>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cuerpo">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     </div>

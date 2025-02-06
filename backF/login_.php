@@ -54,7 +54,7 @@ function validaCredenciales(&$validador){
 		if(getPermisos(pg_escape_string($vUsu))){ // Busca en la tabla de usuarios
 			$sql =  "select a.descripcion as salida from esquemas a, usuarios b " .
 					"where b.idusuario='$vUsu' and a.idesquema = b.idesquema";
-			$rol = getcampo($sql);
+			$rol = getcampo($sql); $alias = obtenAliasUsuario($vUsu);
 			if ($rol!=""){
 				$v_Datos  			  	= getDatos(pg_escape_string($vUsu), $v_Pass);// regresa cadena de datos separada por |
 				$v_Datos 			  	= explode("|", $v_Datos);					 // Se convierte en arreglo
@@ -74,6 +74,7 @@ function validaCredenciales(&$validador){
 					$_SESSION['OpeFinTituloS']    = "Sistema de Operación Bancaria Web";
 					$_SESSION["OpeFinError"]	  = "";
 					$_SESSION['tiempo'] 		  = time();
+					$_SESSION['alias']			  = $alias;
 				}else{
 					$validador["success"] = false;
 					$validador["mensaje"] = "Usuario y contraseña inválidos";
@@ -245,5 +246,14 @@ function decrypt($jsonStr, $passphrase)
 	return json_decode($data, true);
 }
 // ___________________________________________
+function obtenAliasUsuario($vUsu){
+	$sql   = "select alias as salida from public.usuarios where idusuario='$vUsu'";
+	$alias = getcampo($sql);
+	if ($alias==""){
+		$alias = $_SERVER['REMOTE_ADDR'];
+		$alias = str_replace(".", "", $alias);
+	}
+	return $alias;
+}
 // ___________________________________________
 ?>

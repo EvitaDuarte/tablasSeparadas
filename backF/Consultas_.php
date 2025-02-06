@@ -33,10 +33,11 @@
 	$idUsuario     	= $_SESSION['OpeFinClave'];
 	$esquemaUsuario = $_SESSION['OpeFinEsquema'];
 	$ip 			= $_SERVER['REMOTE_ADDR'];
+	$v_Alias        = $_SESSION['alias'];
 	// _________________________________________
 	$respuesta = array(	'success'=>false , 'mensaje'=>""	 , 'resultados'=>array(), 'opcion'=>array() , 'ctas'=>array(),
 						'urs'=>array()   , 'opera'=>array()  , 'ctrl'=>array()      , 'datos'=>array()  , 'tipoMov'=>"",
-						'_trace'=>"");
+						'_trace'=>""	 , 'alias'=>$v_Alias);
 	// Lee el cuerpo de la solicitud HTTP
 	$jsonData = file_get_contents('php://input');
 	// Decodifica los datos JSON en un array asociativo
@@ -52,6 +53,7 @@
 	switch ($vOpc) {
 //	_____________________________________________________________________________________________
 		case 'CargaCuentasBancarias': 			// Se regresara el select de la tabla cuentasbancarias
+		case 'CargaCuentasBancarias0':
 		case 'CargaCuentasBancarias1':
 		case 'CargaCuentasBancarias2':
 			CargaCuentasBancarias($respuesta);
@@ -66,6 +68,7 @@
 		case 'BuscaMovimientosBancarios':
 			$respuesta["ctrl"]    = $respuesta["opcion"]["aCampos"];
 			if ($respuesta["opcion"]["salida"]==="Pantalla"){
+				procesaCtas($respuesta);
 				$respuesta["success"] = BuscaYPagina($respuesta["opcion"]);
 				$respuesta["mensaje"] = ""; 
 			}elseif ($respuesta["opcion"]["salida"]==="Csv"){
@@ -94,5 +97,47 @@ return;
 function CargaCuentasBancarias(&$respuesta){
 	metodos::traeCuentasBancarias($respuesta);
 }	
+// ________________________________________________________________________________________
+function procesaCtas(&$r){
+	$cCtaI = $r["opcion"]["cuentaI"]; $cCtaF = $r["opcion"]["cuentaF"];
+	$aCtas = arregloCtasBancarias($cCtaI,$cCtaF);
+
+	try {
+		creaTablaTemporal($r);
+		foreach($aCtas as $cta){
+			$cCta = $cta["idcuentabancaria"];
+			buscaMovsCta($cCta,$r);
+		}
+		$r["opcion"]["tabla"]		= "temp.t_" . $r["alias"] . " a ";
+		$r["opcion"]["tablaPrin"]	= "temp.t_" . $r["alias"] . " "  ; // Al parecer esta no se utiliza en Pagina_y_Busca
+
+		
+	} catch (Exception $e) {
+		$r["mensaje"] = $e->getMessage();
+		return false;
+	}
+}
+// ________________________________________________________________________________________
+// ________________________________________________________________________________________
+function creaTablaTemporal($r){
+	$alias	= "temp.t_" . $r["alias"];
+	$sql	= "DROP TABLE IF EXISTS $alias"; 
+	$res	= ejecutaSQL_($sql);
+	$sql	= "CREATE TABLE $alias (LIKE atablas.machote INCLUDING ALL)";
+	$res	= ejecutaSQL_($sql);
+}
+// ________________________________________________________________________________________
+function buscaMovsCta($cCta,&$r){
+	// Al realizar el copiado desde el servidor, no es necesario particionar el select por el limite del buffer de PHP sehun chatGPT
+	$alias	= "temp.t_" . $r["alias"];
+	$cTabla	= "atablas.t_" . $cCta;
+	$sql 	= "insert into $alias " .
+			  "select * from $cTabla a where " . $r["opcion"]["join"];
+	$res	= ejecutaSQL_($sql);
+	$r["_sql"] = $sql;
+
+}
+// ________________________________________________________________________________________
+// ________________________________________________________________________________________
 // ________________________________________________________________________________________
 ?>

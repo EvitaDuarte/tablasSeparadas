@@ -40,7 +40,7 @@
 
                                 <section class="seccion_caja_despliegue" id="despliegue">
                                     <div class="caja_captura" style="width=10%;!important">
-                                        <label class="lbl_txt">Fecha(dd/mm/yyyy)</label>
+                                        <label class="lbl_txt">Fecha</label>
                                          <input type="date" id="idFecha" onfocus="guardarValorOriginal(this)"; 
                                          onblur="validaFecha1(this)";/>
                                     </div>
@@ -48,11 +48,11 @@
                                         <label class="lbl_txt">UR</label>
                                          <select name="idUr" id="idUr"></select>
                                     </div>
-                                    <div class="caja_captura">
+                                    <div class="caja_captura3">
                                         <label class="lbl_txt">Operacion</label>
                                          <select name="idOpera" id="idOpera" onchange="filtraControles(this.value);"></select>
                                     </div>
-                                    <div class="caja_captura">
+                                    <div class="caja_captura3">
                                         <label class="lbl_txt">Control</label>
                                          <select name="idCtrl" id="idCtrl" onblur="revisarOperacion();"></select>
                                     </div>
@@ -100,6 +100,8 @@
                                             <option value="">Seleccione</option>
                                             <option value="Eliminar">Eliminar</option>
                                             <option value="Cancelar">Cancelar</option>
+                                            <option value="EliXls">Eliminar XLS</option>
+                                            <option value="CanceXls">Cancelar XLS</option>
                                         </select>
                                     </div>
                                     <div class="caja_captura"></div>
@@ -226,7 +228,7 @@
                 <hr>
                 <div class="dialogo_body">
                     <div class="caja_captura">
-                        <label class="lbl_txt">Fecha(dd/mm/yyyy)</label>
+                        <label class="lbl_txt">Fecha</label>
                         <input type="date" id="idFechaCan" onblur="validaFecha1(this)";/> <!-- onblur="validaFecha(this.value,'idFechaCan',true);" -->
                     </div>
                 </div>
@@ -242,7 +244,7 @@
                 <hr>
                 <div class="dialogo_body">
                     <div class="caja_captura">
-                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT" onchange="ponArchivoCarga();">
+                        <input type="file" name="ArchivoCarga_file" id="ArchivoCarga_file" class="inputF-file1" accept=".txt,.TXT,.xlsx,.XLSX,.xls,.XLS" onchange="ponArchivoCarga();">
                         <label for="ArchivoCarga_file" class="inputF-label1" id="lblCarga">
                             <i class="large material-icons space" id="input_icon">&#10697;</i>
                             <span id="input_text">
@@ -261,8 +263,6 @@
         <script src="jsF/cerrarSesion_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Ingresos_.js"></script>
-        <script type="text/javascript">
-            // efectoBotones();  // Para que cambie de color cuando pase el cursor el usuario
-        </script>
+        <script src="assetsF/js/xlsx.mini.min.js"></script>
     </body>
 </html>

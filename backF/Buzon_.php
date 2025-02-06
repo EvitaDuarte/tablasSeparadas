@@ -209,13 +209,13 @@ function validaReferencias(&$respuesta){
 function CargaCatalogos(&$respuesta){
 	try{
 		// Traigo Operación-Control
-		$sql = 	"select a.idoperacion, b.idcontrol , b.nombre from operacionesbancarias a , controlesbancarios b " .
+		$sql = 	"select a.idoperacion, b.idcontrol , b.nombre, a.tipo from operacionesbancarias a , controlesbancarios b " .
 				" where a.idoperacion=b.idoperacion order by nombre ";
 		$res = ejecutaSQL_($sql);
 		if ( $res!=null){
 			$respuesta["combo"][] 	 = " ,Seleccione"; // Valor nulo
 			foreach ($res as $r ){	// llena el combo con la clave y nombre de la operación bancaria
-				$respuesta["combo"][] = $r["idoperacion"]."-".$r["idcontrol"] . "," . $r["nombre"] ." - [". $r["idoperacion"]."-".$r["idcontrol"]."]";
+				$respuesta["combo"][] = $r["idoperacion"]."-".$r["idcontrol"] . ","  . $r["nombre"] ." - [". $r["tipo"] . "-" .$r["idoperacion"]."-".$r["idcontrol"]."]";
 			}
 			// Busco las cuentas Bancarias , se filtran si el usuario no es el administrador
 			if ($respuesta["sesion"]["esquemaUsuario"]=="Administrador"){

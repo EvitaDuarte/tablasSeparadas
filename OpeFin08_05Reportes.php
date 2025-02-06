@@ -1,17 +1,19 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es">  
     <head>
         <?php
             require_once("OpeFin00_00VarSesion.php"); // Pone disponible las variables de sesión
         ?>
-        <meta charset="UTF-8-8" />
+        <meta charset="uft-8" />
         <title><?=$v_TituloS?></title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <!-------------General Style's--------------->
         <link rel="stylesheet" href="assetsF/css/panel_style.css">
         <link rel="stylesheet" href="assetsF/css/seccion.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
+
         <form name="Reportes" id="Reportes" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); // Incluye el menú principal?>
@@ -59,6 +61,18 @@
                                                     <span>Reporte</span>
                                                 </a>
                                         </div>
+                                    </div>
+                                </section>
+                                <section class="seccion_caja_despliegue_70" id="cuadricula">
+                                    <div class="tabla-con-cuadricula">
+                                        <table class="tablex" id="tablaVacia">
+                                            <thead>
+                                                <tr>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cuerpo">
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </section>
                             </div>

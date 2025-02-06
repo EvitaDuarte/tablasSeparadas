@@ -192,13 +192,14 @@ function paginaMovimientos(cPag){
 			break;
 		}
 	}
+	cTabla = "atablas.t_" + cCta;
 	//
 	aDatos = {
 		opcion 			: "FiltraMovimientosIne",
 		limite			: document.getElementById("num_registros").value,
 		busca			: document.getElementById("campo").value,
 		pagina 			: pagina,
-		tabla			: " movimientos a , operacionesbancarias b ",
+		tabla			: " " + cTabla + " a , operacionesbancarias b ",
 		tablaPrin		: "movimientos",
 		join			: " a.idoperacion=b.idoperacion  and idcuentabancaria='"+cCta+"' ",
 		campos			: cCampos,

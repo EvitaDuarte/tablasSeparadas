@@ -9,18 +9,20 @@
  *                Unadm-Proyecto Terminal para INE 		*
  * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
-var cPhp      = "Consultas_.php";	// En este php estarán las funciones que se invocaran desde este JS
-var cPhp1	  = "Reportes_.php";	// Se separa la parte de los reportes
-var dHoy	  = "";					// fecha de Hoy que regresa el servidor
-var gTabla	  = "";					// Tabla HTML que se esta visualizando
-var gForma	  = "";
-var cPag 	  = "-1";				// Inicialización páginado servidor
-var funPagina = ""					// Función que tendrá que ejecutar nextpage
-var dHoy	  = ""
-var pagCta	  = "";					// Guarda la cuenta Bancaria para el paginado
-var lTurno	  = false;
-var lOkCheque = 0;				// Error en los rangos de cheque
-var gLongChe  = 8;
+var cPhp      	 = "Consultas_.php";	// En este php estarán las funciones que se invocaran desde este JS
+var cPhp1	  	 = "Reportes_.php";	// Se separa la parte de los reportes
+var dHoy	  	 = "";					// fecha de Hoy que regresa el servidor
+var gTabla	  	 = "";					// Tabla HTML que se esta visualizando
+var gForma	  	 = "";
+var cPag 	  	 = "-1";				// Inicialización páginado servidor
+var funPagina 	 = ""					// Función que tendrá que ejecutar nextpage
+var dHoy	  	 = ""
+var pagCta	  	 = "";					// Guarda la cuenta Bancaria para el paginado
+var lTurno	  	 = false;
+var lOkCheque 	 = 0;					// Error en los rangos de cheque
+var gLongChe  	 = 8;
+var gResultLines = [];					// Arreglo global g
+var gOfcCtasInt	 = "";					// 
 
 window.onload = function () {		// Función que se ejecuta al cargar la página HTML que invoca a Consultas.js
 	// Se obtiene el nombre del archivo que lo invoca
@@ -33,7 +35,7 @@ window.onload = function () {		// Función que se ejecuta al cargar la página H
 		// ______________________________________
 		case "OpeFin08_01EdoPosFinDia.php":
 			aDatos = {
-				opcion 	: "CargaCuentasBancarias"
+				opcion 	: "CargaCuentasBancarias0"
 			};
 			// Esta función esta en rutinas_.js e invoca a la función procesarRespuesta__ que esta en este archivo
 			//con sole.log(`Va a ejecutar ${cHtml} ${cPhp} ${aDatos}`)
@@ -49,6 +51,8 @@ window.onload = function () {		// Función que se ejecuta al cargar la página H
 		// __________________________________________________________________________________
 		// __________________________________________________________________________________
 		case "OpeFin08_03Consolidado.php":
+			gForma = "ConsoGral";
+			quitaSubmit(gForma);
 			aDatos = {
 				opcion 	: "FechaHoy"
 			};
@@ -78,6 +82,14 @@ window.onload = function () {		// Función que se ejecuta al cargar la página H
 			conectayEjecutaPost(aDatos,cPhp,null);
 		break;
 		// __________________________________________________________________________________
+		case "OpeFin08_06Exportar.php":
+			// Nada por el momento
+			aDatos = {
+				opcion : "CtasOF16"
+			};
+			conectayEjecutaPost(aDatos,cPhp1,null);
+		break;
+		// __________________________________________________________________________________
 		default:
 			mandaMensaje("No esta codificado el init de "+cHtml);
 		break;
@@ -91,14 +103,21 @@ window.onload = function () {		// Función que se ejecuta al cargar la página H
 // __________________________REGRESOS DE PHP _____________________________________
 async function procesarRespuesta__(vRes) {		
 	cOpc = vRes.opcion.opcion;					// Es como se recupera en PHP la opción 
-    //con sole.log(`cOpc=${cOpc}`);
+    //con sole.log(`cOpc=[${cOpc}]`);
     switch(cOpc) {
+    	// _____________________________________________
+    	case "CargaCuentasBancarias0":
+            await rCargaCuentasBancarias0(vRes);
+            await escuchaFoco(["idCuentabancaria"]);
+            await FocoEn("idCuentabancaria");
+			llenaFechaHoy("FechaIni",vRes.opcion.hoy);
+		break;
     	// _____________________________________________
     	case "CargaCuentasBancarias":
             await rCargaCuentasBancarias(vRes);
             await escuchaFoco(["idCuentabancaria"]);
             await FocoEn("idCuentabancaria");
-			llenaFechaHoy("FechaIni",vRes.opcion.hoy,true);
+			llenaFechaHoy("FechaIni",vRes.opcion.hoy,true); // Pone el primer día del mes corriente
 			llenaFechaHoy("FechaFin",vRes.opcion.hoy);
 		break;
     	// _____________________________________________
@@ -129,7 +148,7 @@ async function procesarRespuesta__(vRes) {
 		break;
 		// _____________________________________________
 		case "ConsolidadoGeneral":
-			console.log("Consolidado General vRes=["+vRes+"]");
+			//con sole.log("Consolidado General vRes=["+vRes+"]");
 			await abrePdf(vRes.archivo);
 		break;
 		// _____________________________________________
@@ -154,6 +173,15 @@ async function procesarRespuesta__(vRes) {
 			}
 		break;
 		// _____________________________________________
+		case "CtasOF16":
+			gOfcCtasInt = vRes.resultados[0].ctas_intereses;
+			// mandaMensaje(gOfcCtasInt);
+		break;
+		// _____________________________________________
+		case "InteresesPdf":
+			await abrePdf(vRes.archivo);
+		break;
+		// _____________________________________________
 		default:
 			mandaMensaje("No esta codificado el regreso JS de [" + cOpc +"]" );
 		break;
@@ -172,9 +200,16 @@ async function procesarError__(vRes) {
     }
 }
 // __________________________REGRESOS DE PHP ______________________________________
+function rCargaCuentasBancarias0(vRes){
+	dHoy = vRes.opcion.hoy;
+	// con sole.log("Hoy: "+dHoy);
+	llenaCombo( document.getElementById("idCuentabancaria") , vRes.ctas );
+	document.querySelector("#FechaIni").value = dHoy; // fddmmyyyy(dHoy,"-");
+}
+// ________________________________________________________________________________
 function rCargaCuentasBancarias(vRes){
 	dHoy = vRes.opcion.hoy;
-	//con sole.log(vRes);
+	// con sole.log("Hoy: "+dHoy);
 	llenaCombo( document.getElementById("idCuentabancaria") , vRes.ctas );
 	document.querySelector("#FechaIni").value = dHoy; // fddmmyyyy(dHoy,"-");
 }
@@ -391,26 +426,28 @@ const ImpresionRangoCheques = () =>{
 	cCheIni = document.getElementById("idCheIni").value;
 	cCheFin = document.getElementById("idCheFin").value;
 	cCeros	= cerosIzquierda("",gLongChe);
-
-	if (cCheIni==cCeros){
-		FocoEn("idCheIni");
-		mandaMensaje("El cheque Inicial no pude ser ceros");
-		FocoEn("idCheIni");
-		return false;
+	cCta	= valorDeObjeto("idCuentabancaria");
+	if (cCta!==null){
+		if (cCheIni==cCeros){
+			FocoEn("idCheIni");
+			mandaMensaje("El cheque Inicial no puede ser ceros");
+			FocoEn("idCheIni");
+			return false;
+		}
+		if (cCheFin==cCeros){
+			FocoEn("idCheFin");
+			mandaMensaje("El cheque Final no puede ser ceros");
+			FocoEn("idCheFin");
+			return false;
+		}
+		aDatos={
+			opcion		: "ImpresionRangoCheques",
+			idCuenta	: pagCta,
+			cheIni		: cCheIni,
+			cheFin		: cCheFin
+		}
+		conectayEjecutaPost(aDatos,cPhp1,null);
 	}
-	if (cCheFin==cCeros){
-		FocoEn("idCheFin");
-		mandaMensaje("El cheque Final no pude ser ceros");
-		FocoEn("idCheFin");
-		return false;
-	}
-	aDatos={
-		opcion		: "ImpresionRangoCheques",
-		idCuenta	: pagCta,
-		cheIni		: cCheIni,
-		cheFin		: cCheFin
-	}
-	conectayEjecutaPost(aDatos,cPhp1,null);
 }
 // ________________________________________________________________________________
 const refrescaPantalla = () =>{
@@ -435,6 +472,300 @@ const reporteSolicitado = () =>{
 			conectayEjecutaPost(aDatos,cPhp1,null);
 		}
 	}
+}
+// ________________________________________________________________________________
+const expoArch = () =>{
+	cOpc = document.getElementById("idExportar").value
+	switch(cOpc){
+		// _____________________________
+		case "":
+		break;
+		// _____________________________
+		case "Intereses":
+			document.getElementById('ArchivoCarga_file').value = "";
+			document.getElementById("input_text").textContent = "Seleccione Archivo de Intereses";
+			archivoLayOut(cOpc,"intereses");
+		break;
+		// _____________________________
+		case "Respuesta":
+			document.getElementById('ArchivoCarga_file').value = "";
+			document.getElementById("input_text").textContent = "Seleccione Archivo de Respuesta Intereses";
+			archivoLayOut(cOpc,"respuesta de intereses");
+		break;
+		// _____________________________
+	}
+}
+// ________________________________________________________________________________
+const archivoLayOut = (cOpc,cTit) =>{	// Solicita archivo de layOut
+	solicitaArchivoLayOut().then((respuesta) => {
+		if (respuesta){ // Segun yo siempre regresa true
+			var input1_file = document.getElementById('ArchivoCarga_file');
+			if (input1_file.files.length >0){
+				var oFile		= input1_file.files[0];
+				cFile 			= oFile.name;
+				
+				esperaRespuesta(`Desea iniciar carga de ${cTit} de ${cFile} `).then((respuesta) => {
+					if (respuesta){
+						const reader  = new FileReader();
+						reader.onload = function (e) {
+							const txtContent = e.target.result;
+							if (cOpc==="Intereses"){
+								procesarTxtIntereses(txtContent);
+							}else if(cOpc==="Respuesta"){
+								procesarTxtRespuesta(txtContent);
+							}
+						};
+						if (cOpc=="Intereses" || cOpc=="Respuesta"){ // Usar para txt o csv
+							reader.readAsText(oFile, 'UTF-8');
+						}else if (cOpc=="EX" || cOpc=="CX"){ // Usar para un XLS
+							reader.readAsArrayBuffer(oFile);
+						}
+					}
+				});
+			}else{
+				mandaMensaje("No se ha seleccionado archivo");
+				document.getElementById("idExportar").value = "";
+			}
+		}
+	});
+}
+// ________________________________________________________________________________
+const procesarTxtIntereses = (txtContent) =>{
+	// Paso 1: Dividir el contenido por líneas
+	let lines = txtContent.split('\n');
+
+	let instituteLine	= null;
+	gResultLines		= [];
+	let listaUrs		= [];
+	oFecha				= obtenerFechaYHora();
+	//cFecha			= oFecha.fechaFormateada;
+	//cHora				= oFecha.horaFormateada;
+
+
+	// Paso 2: Iterar sobre las líneas y generar las combinaciones
+	cSucOri = ""; cCta = ""; cCta1 = "";
+	lines.forEach(line => {
+		let columns = line.split('|');
+
+		// Condición 1: Buscar líneas con "INSTITUTO NACIONAL ELECTORAL" en la cuarta columna
+		if (columns.length >= 4 && columns[3].trim() === 'INSTITUTO NACIONAL ELECTORAL') {
+			cSucOri = columns[7].trim().padStart(4,"0");
+			cCta1	= columns[8].trim();
+			cCta	= cCta1.padStart(20,"0");
+
+			cUr		= columns[9].substring(0,4);
+			cHora	= columns[1].replace(":","");
+		}
+
+		// Condición 2: Buscar líneas con "A" en la tercera columna y "73" en la cuarta columna
+		if (columns.length >= 4 && columns[2].trim() === 'A' && columns[3].trim() === '73') {
+			if (gOfcCtasInt.includes(cCta1)){
+				// Excluir oficinas Centrales
+			}else{
+		    	cImpo = columns[8];
+		    	cImpo = cImpo.replace(/,/g, '').replace('.', '').padStart(14, '0');
+		    	cFecha= columns[1].split("/");
+		    	cFecha= cFecha[2]+cFecha[1];
+
+		    	linea={
+		    		a01_tiptra: "01",
+		    		a02_ctaOri: "01", 
+		    		a03_sucOri: cSucOri,
+		    		a04_cuenta: cCta,
+		    		a05_ctaDes: "01",
+		    		a06_sucOfc: "7001",
+		    		a07_ctaIne: "00000000000003854775",
+		    		a08_Impo  : cImpo,
+		    		a09_Moneda: "001",
+		    		a10_Ur	  : cUr,
+		    		a11_Fecha : cFecha,
+		    		a12_Hora  : cHora
+		    	};
+		    	gResultLines.push(linea); // Agregamos la nueva línea combinada al resultado
+		    }
+	    	cSucOri = ""; cCtaOri = ""; cCta1 = "" ; cCta= "";
+		}
+	});	
+	// Ordenar arreglo
+	gResultLines.sort((a, b) => {
+		if (a.a10_Ur < b.a10_Ur) {
+			return -1;  // Si a es menor que b, se coloca antes
+		}
+		if (a.a10_Ur > b.a10_Ur) {
+			return 1;   // Si a es mayor que b, se coloca después
+		}
+		return 0;  // Si son iguales, no se cambian de lugar
+	});	
+	//
+	//console.log(gResultLines);
+
+	// Paso 3: Poblar la tabla en HTML
+	const cuerpoTabla = document.getElementById('cuerpo'); // Obtener el cuerpo de la tabla
+
+	// Limpiar el cuerpo de la tabla antes de agregar nuevos datos
+	cuerpoTabla.innerHTML = '';
+
+	// Iterar sobre cada línea de gResultLines y agregar una fila (tr) con celdas (td)
+	gResultLines.forEach(linea => {
+		let fila = document.createElement('tr');
+
+		// Crear las celdas de la fila según los valores de la línea
+		Object.values(linea).forEach(valor => {
+			let celda = document.createElement('td');
+			celda.textContent = valor; // Asignamos el valor de la celda
+			fila.appendChild(celda); // Añadimos la celda a la fila
+		});
+
+		// Añadir la fila al cuerpo de la tabla
+		cuerpoTabla.appendChild(fila);
+	});
+
+	// Eliminar la columna 'a10_Ur' de cada línea en gResultLines
+	//gResultLines.forEach(linea => {
+	//    delete linea.a10_Ur;
+	//});
+
+	// Llamada a la función para generar y descargar el archivo
+	generarArchivoTXT(gResultLines);
+	expoPdf();
+	document.getElementById("idExportar").value = "";
+
+/*
+	// Paso 2: Filtrar las líneas que cumplan con las condiciones
+	let aLineas = [];
+	let filteredLines = lines.filter(line => {
+		// Dividir cada línea en columnas usando "|" como separador
+		let columns = line.split('|');
+
+		// Verificar si la línea tiene al menos 4 columnas (para evitar errores)
+		if (columns.length >= 4) {
+	    	// Condición 1: Comprobar si la cuarta columna es "INSTITUTO NACIONAL ELECTORAL"
+	    	if (columns[3].trim() === 'INSTITUTO NACIONAL ELECTORAL') {
+	    		aLineas.push(columns);
+	      		return true;
+	    	}
+
+	    	// Condición 2: Comprobar si la tercera columna es "A" y la cuarta columna es "73"
+	    	if (columns[2].trim() === 'A' && columns[3].trim() === '73') {
+	    		aLineas.push(columns);
+	      		return true;
+	    	}
+		}
+
+		// Si no se cumple ninguna de las condiciones, se descarta la línea
+		return false;
+	});
+	console.log(aLineas);
+	let instituteLine 	= null;
+	let gResultLines 	= [];	
+
+	aLineas.forEach((linea)=>{
+
+	});
+
+			 vRes.unidades.forEach((unidad) => {
+		 	UrSet.add(unidad["descripcion"].trim()); 
+
+		 });
+	let processedLines = filteredLines.map(line => {
+		let columns = line.split('|');
+		var cSucOri;
+  		if (columns[03].trim()=="INSTITUTO NACIONAL ELECTORAL"){
+  			cSucOri = columns[7];
+  		}else{ // A 73
+
+  		}
+		return {
+			tipTra: '01',
+			ctaOri: '01',
+			sucOri: cSucOri
+			codigo: columns[2],
+			entidad: columns[3],
+			otroCampo: columns[4],
+		// Aquí puedes agregar los demás campos que necesites
+		};
+	});
+
+	console.log(processedLines); */
+}
+// ________________________________________________________________________________
+const generarArchivoTXT = (resultLines) => {
+	let contenidoArchivo = '';
+
+	// Paso 1: Iterar sobre resultLines y generar el contenido del archivo
+	resultLines.forEach(linea => {
+		let lineaFormateada = '';
+
+		// Concatenar cada valor de la línea en una sola cadena sin separadores ni espacios
+		lineaFormateada += linea.a01_tiptra;
+		lineaFormateada += linea.a02_ctaOri;
+		lineaFormateada += linea.a03_sucOri;
+		lineaFormateada += linea.a04_cuenta;
+		lineaFormateada += linea.a05_ctaDes;
+		lineaFormateada += linea.a06_sucOfc;
+		lineaFormateada += linea.a07_ctaIne;
+		lineaFormateada += linea.a08_Impo;
+		lineaFormateada += linea.a09_Moneda;
+		lineaFormateada += linea.a11_Fecha;
+		lineaFormateada += linea.a12_Hora;
+
+		// Añadir la línea al contenido del archivo, seguida de un salto de línea
+		contenidoArchivo += lineaFormateada + '\n';
+	});
+
+	// Paso 2: Crear un blob con el contenido y permitir la descarga del archivo
+	const blob = new Blob([contenidoArchivo], { type: 'text/plain' });
+	const url = URL.createObjectURL(blob);
+
+	// Crear un enlace para la descarga
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = `in${cFecha}${cHora}.txt`; // Generar el nombre del archivo basado en la fecha y hora
+	document.body.appendChild(a); // Añadir el enlace al DOM (para que funcione en algunos navegadores)
+	a.click(); // Hacer clic en el enlace para descargar el archivo
+	document.body.removeChild(a); // Eliminar el enlace después de la descarga
+	URL.revokeObjectURL(url); // Revocar la URL después de usarla
+};
+// ________________________________________________________________________________
+const obtenerFechaYHora = () => {
+	const fecha = new Date();
+
+	// Obtener el año (últimos dos dígitos)
+	const year = fecha.getFullYear().toString().slice(-2); // '25' para 2025
+
+	// Obtener el mes y el día (asegurarse de que tengan 2 dígitos)
+	const mes = (fecha.getMonth() + 1).toString().padStart(2, '0'); // '01' para enero
+	const dia = fecha.getDate().toString().padStart(2, '0'); // '24' para el 24 de enero
+
+	// Obtener la hora y los minutos (asegurarse de que tengan 2 dígitos)
+	const hora = fecha.getHours().toString().padStart(2, '0'); // '13' para 1:00 PM
+	const minutos = fecha.getMinutes().toString().padStart(2, '0'); // '30' para 30 minutos
+
+	// Concatenar todo en el formato requerido
+	const fechaFormateada = `${year}${mes}${dia}`;
+	const horaFormateada = `${hora}${minutos}`;
+
+	return { fechaFormateada, horaFormateada };
+};
+// ________________________________________________________________________________
+const expoPdf = () =>{
+	cOpcion = document.getElementById("idExportar")
+	if (gResultLines.length==0){
+		mandaMensaje("No se ha cargado el archivo TXT");
+		return false;
+	}
+	aDatos={
+		opcion		: "InteresesPdf",
+		aRes		: gResultLines
+	}
+	conectayEjecutaPost(aDatos,cPhp1,null);
+
+}
+// ________________________________________________________________________________
+const procesarTxtRespuesta = (txtContent) =>{
+	// Paso 1: Dividir el contenido por líneas
+	let lines = txtContent.split('\n');
+	mandaMensaje(lines);
 }
 // ________________________________________________________________________________
 // ________________________________________________________________________________

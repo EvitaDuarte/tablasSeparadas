@@ -82,14 +82,18 @@ public static function CargaCatalogosMovimientos(&$respuesta){
     $respuesta["opera"]          = $oCatalogo->filtraOperaciones($respuesta["tipoMov"]);
     $oCatalogo                   = new controlBancario(null,null);
     $respuesta["ctrl"]           = $oCatalogo->filtraControles($respuesta["tipoMov"]);
-    $respuesta["urs"]            = self::traeUrs();
+    $respuesta["urs"]            = self::traeUrs(true);
     $respuesta["success"]        = true;
     $respuesta["opcion"]["anio"] = self::traeAnio("01"); // 01 es el Id para año mínimo captura de movs
     $respuesta["opcion"]["hoy"]  = date("Y-m-d");
 }
 //  _______________________________________________________________________________________________
-public static function traeUrs(){
-    $sql = "select idunidad, nombreunidad from unidades order by idunidad";
+public static function traeUrs($lFiltro=false){
+    $where = "";
+    if ($lFiltro){
+        $where = " where estatus=true "; 
+    }
+    $sql = "select idunidad, nombreunidad from unidades $where order by idunidad ";
     $res = ejecutaSQL_($sql);
     if ( $res!==null){
         $regreso[]   = " ,Seleccione"; // Valor nulo
@@ -209,6 +213,17 @@ public static function traeCatalogoOperacionesConciliacion(){
         $result = null;
     }
     return $result;
+}
+//  _______________________________________________________________________________________________
+public static function CtasOF16(&$r){
+    $sql =  "select idunidad,ctas_intereses from unidades " .
+            "where estatus is true and ctas_intereses is not null and idunidad='OF16'";
+    $res = ejecutaSQL_($sql);
+    if ( $res!==null){
+        $r["resultados"] = $res;
+        $r["success"]    = true;
+    }
+    return null;
 }
 //  _______________________________________________________________________________________________
 //

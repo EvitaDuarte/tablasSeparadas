@@ -239,8 +239,8 @@ function BuscarMovimientos(cPag){
 	cCampos += "a.concepto,a.idunidad,a.idoperacion,a.idcontrol,a.anioejercicio,a.idmovimiento,a.estatus,a.usuarioalta,a.fechaalta"
 	cTipos   = "C,C,C,N,D,C,C,C,C,C,C,N,C,C,D"; // C - Caracter , N Número , D - Fecha
 
-	where    =  "a.idcuentabancaria>='"+cCtaIni+ "' and a.idcuentabancaria<='"+cCtaFin+ "' and " +
-				"a.importeoperacion>=" +cImpIni+ "  and a.importeoperacion<=" +cImpFin+ "  and "  +
+//				"a.idcuentabancaria>='"+cCtaIni+ "' and a.idcuentabancaria<='"+cCtaFin+ "' and " + //
+	where    =  "a.importeoperacion>=" +cImpIni+ "  and a.importeoperacion<=" +cImpFin+ "  and "  +
 				"a.fechaoperacion>='"  +cFecIni+ "' and a.fechaoperacion<='"  +cFecFin+ "' ";
 
 	if (cW!==""){
@@ -266,6 +266,8 @@ function BuscarMovimientos(cPag){
 						   "a.idunidad","a.idoperacion","a.idcontrol","a.anioejercicio","a.idmovimiento","a.estatus","a.usuarioalta","a.fechaalta"],
 		fechaIni		: cFecIni,
 		fechaFin		: cFecFin,
+		cuentaI			: cCtaIni,
+		cuentaF			: cCtaFin,
 		busqueda		: sBusca
 	};
 	//

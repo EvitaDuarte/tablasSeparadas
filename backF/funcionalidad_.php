@@ -87,9 +87,12 @@
 		// ___________________________________________
 		case "AccesosConsulta":
 			AccesosConsulta($respuesta);
-			if ($respuesta["datos"]["traeCatalogos"]){ // Voy por lo que tenga la tabla de esquemas
+			AccesosCatalogos($respuesta);
+			/*if ($respuesta["datos"]["traeCatalogos"]){ // Voy por lo que tenga la tabla de esquemas
 				AccesosCatalogos($respuesta);
-			}
+			}else{
+				AccesosCatalogos($respuesta);
+			}*/
 		break;
 		// ____________________________________________
 		case "AccesosAgrega":
@@ -204,6 +207,7 @@ function AccesosCatalogos(&$respuesta){
 			foreach ($res as $r ){
 				$respuesta["combo1"][] = $r["idusuario"].",".$r["idusuario"];
 			}
+			$respuesta["success"]	 = true;
 		}
 	}
 }

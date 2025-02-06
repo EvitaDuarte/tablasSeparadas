@@ -11,73 +11,79 @@
             		<li id="ADM" data-esquema="ADM,ING,EGR,CHE,CAP"> 
                     	<a>Admin<b>▼</b></a>
                 		<ul>
-                    		<li onClick="Enviar('OpeFin01_01Usuarios.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_01Usuarios.php');" id="a1" data-esquema="ADM">
                     			<a>Usuarios</a></li>
-                    		<li onClick="Enviar('OpeFin01_02Esquemas.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_02Esquemas.php');" id="a2" data-esquema="ADM">
                     			<a>Esquemas</a></li>
-                    		<li onClick="Enviar('OpeFin01_03Configuracion.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_03Configuracion.php');" id="a3"  data-esquema="ADM">
                     			<a>Configuración</a></li>
-                    		<li onClick="Enviar('OpeFin01_04Accesos.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_04Accesos.php');" id="a4" data-esquema="ADM">
                     			<a>Accesos</a></li>
-                    		<li onClick="Enviar('OpeFin01_05Regenerar.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_05Regenerar.php');" id="a5" data-esquema="ADM">
                     			<a>Reconstruir Saldos</a></li>
-                    		<li onClick="Enviar('OpeFin01_06Formato.php');" data-esquema="ADM">
+                    		<li onClick="Enviar('OpeFin01_06Formato.php');" id="a6" data-esquema="ADM">
                     			<a>Formato Cheques</a></li>
                     		<hr>
-                    		<li onClick="Enviar('OpeFin02_01CuentasBancarias.php');" data-esquema="ING,EGR,CHE,CAP">
+                    		<li onClick="Enviar('OpeFin02_01CuentasBancarias.php');" id="a7" data-esquema="ADM,ING,EGR,CHE,CAP">
                     			<a>Cuentas Bancarias </a></li>
-                    		<li onClick="Enviar('OpeFin02_02OperacionesBancarias.php');" data-esquema="ING,EGR,CHE,CAP">
+                    		<li onClick="Enviar('OpeFin02_02OperacionesBancarias.php');" id="a8" data-esquema="ADM,ING,EGR,CHE,CAP">
                     			<a>Operaciones Bancarias </a></li>
-                    		<li onClick="Enviar('OpeFin02_03ControlesBancarios.php');" data-esquema="ING,EGR,CHE,CAP">
+                    		<li onClick="Enviar('OpeFin02_03ControlesBancarios.php');" id="a9" data-esquema="ADM,ING,EGR,CHE,CAP">
                     			<a>Controles Bancarios</a></li>
-                    		<li onClick="Enviar('OpeFin02_04UnidadesResponsables.php');" data-esquema="ING,EGR,CHE,CAP">
+                    		<li onClick="Enviar('OpeFin02_04UnidadesResponsables.php');" id="a10"  data-esquema="ADM,ING,EGR,CHE,CAP">
                     			<a>Unidades Responsables</a></li> 
                 		</ul>
             		</li>
-            		<li  data-esquema="ING,EGR,CHE,CAP">
+            		<li  id="carga" data-esquema="ADM,ING,EGR,CHE,CAP">
                     	<a>Carga<b>▼</b></a>
                         <ul>
-                            <li onClick="Enviar('OpeFin03_01Buzon.php');">   
+                        	<hr>
+                            <li onClick="Enviar('OpeFin03_01Buzon.php');" id="b1" >   
                             	<a>Buzón</a></li>
-							<li onClick="Enviar('OpeFin03_02Reintegros.php');">   
+							<li onClick="Enviar('OpeFin03_02Reintegros.php');" id="b2" >   
                             	<a>Reintegros</a></li>								
                         </ul>
                 	</li>
-            		<li  data-esquema="ING,EGR,CHE,CAP">
+            		<li id="captura" data-esquema="ADM,ING,EGR,CHE,CAP">
                     	<a>Captura<b>▼</b></a>
                         <ul>
-                            <li onClick="Enviar('OpeFin04_01Ingresos.php');" data-esquema="ING,CAP">   
+                        	<hr>
+                            <li onClick="Enviar('OpeFin04_01Ingresos.php');" id="c1" data-esquema="ADM,ING,CAP">   
                             	<a>Ingresos</a></li>
-                            <li onClick="Enviar('OpeFin04_02Egresos.php');" data-esquema="EGR,CAP">
+                            <li onClick="Enviar('OpeFin04_02Egresos.php');" id="c2" data-esquema="ADM,EGR,CAP">
                             	<a>Egresos</a></li>
-                        	<li onClick="Enviar('OpeFin04_03Cheques.php');" data-esquema="CHE,CAP">
+                        	<li onClick="Enviar('OpeFin04_03Cheques.php');" id="c3" data-esquema="ADM,CHE,CAP">
                         		<a>Cheques</a></li>
                         </ul>
                 	</li>
-            		<li  data-esquema="ING,EGR,CHE,CAP">
+            		<li  id="conci" data-esquema="ADM,ING,EGR,CHE,CAP">
                     	<a>Conciliación<b>▼</b></a>
                         <ul>
-                        	<li onClick="Enviar('OpeFin05_01Conciliacion.php');" data-esquema="ING,EGR,CHE,CAP">
+                        	<hr>
+                        	<li onClick="Enviar('OpeFin05_01Conciliacion.php');" id="d1" data-esquema="ADM,ING,EGR,CHE,CAP">
                         		<a>Operación Bancaria</a>
                         	</li>
-                        	<li onClick="Enviar('OpeFin05_02MovsBancos.php');" data-esquema="ING,EGR,CHE,CAP">
+                        	<li onClick="Enviar('OpeFin05_02MovsBancos.php');" id="d2" data-esquema="ADM,ING,EGR,CHE,CAP">
                         		<a>Bancos</a>
                         	</li>
                         </ul>
                 	</li>
-            		<li>
+            		<li id="cons" data-esquema="ADM,ING,EGR,CHE,CAP,EXP">
                     	<a>Consultas<b>▼</b></a>
                         <ul  id="clases_dropdown">
-                            <li onClick="Enviar('OpeFin07_01ConsultasSaldos.php');"><a>Saldos</a></li>
-                            <li onClick="Enviar('OpeFin07_02ConsultasMovimientos.php');"><a>Movimientos</a></li>
+                        	<hr>
+                            <li onClick="Enviar('OpeFin07_01ConsultasSaldos.php');" id="r1" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Saldos</a></li>
+                            <li onClick="Enviar('OpeFin07_02ConsultasMovimientos.php');"  id="r2" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Movimientos</a></li>
                             <hr>
-                            <li onClick="Enviar('OpeFin08_01EdoPosFinDia.php');"><a>Posición Financiera Diaria</a></li>
-                            <li onClick="Enviar('OpeFin08_02EdoPosMensual.php');"><a>Posición Financiera Mensual</a></li>
-                            <li onClick="Enviar('OpeFin08_03Consolidado.php');"><a>Consolidado General</a></li>
-                            <hr>
-                            <li onClick="Enviar('OpeFin08_04ImpCheques.php');"><a>Impresión Cheques</a></li>
-                            <hr>
-                            <li onClick="Enviar('OpeFin08_05Reportes.php');"><a>Reportes</a></li>
+                            <li onClick="Enviar('OpeFin08_01EdoPosFinDia.php');"  id="r3" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Posición Financiera Diaria</a></li>
+                            <li onClick="Enviar('OpeFin08_02EdoPosMensual.php');"  id="r4" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Posición Financiera Mensual</a></li>
+                            <li onClick="Enviar('OpeFin08_03Consolidado.php');"  id="r5" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Consolidado General</a></li>
+                         	<hr>
+                            <li onClick="Enviar('OpeFin08_04ImpCheques.php');"  id="r6" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Impresión Cheques</a></li>
+                         	<hr>
+                            <li onClick="Enviar('OpeFin08_05Reportes.php');"  id="r7" data-esquema="ADM,ING,EGR,CHE,CAP"><a>Reportes</a></li>
+                        	<hr>
+                        	<li onClick="Enviar('OpeFin08_06Exportar.php');"  id="r8" data-esquema="ADM,EXP"><a>Exportar</a></li>
                         </ul>
                 	</li>
  					<li>
@@ -131,20 +137,51 @@
 		<script nomodule="" src="https://unpkg.com/ionicons@4.5.10-0/dist/ionicons/ionicons.js"></script><!--Iconos de IONICONS--> 
 		
 		<script type="text/javascript">
-			// Oculta o Despliega los submenus de cada Opción principal, de acuerdo al ROL
-			vEsquema = document.getElementById("nomEsquema").value.toUpperCase().substring(0,3);
-			//console.log(`Esquema=${vEsquema}`);
-			if (vEsquema!="ADM"){ // El administrador puede ver todo
-			    document.querySelectorAll('li').forEach(function(li) {
+			function actualizarMenus() {
+				/*
+			    vEsquema = document.getElementById("nomEsquema").value.toUpperCase().substring(0, 3);
+			    console.log('Esquema actual:', vEsquema);
+
+			    document.querySelectorAll('li').forEach(function(li, index) {
 			        var esquemas = li.getAttribute('data-esquema');
-			        if (esquemas!=null){// Algunos li no tienen data-esquema
-				        //console.log(`Esquema=${esquemas}`);
-				        if (esquemas.includes(vEsquema)) {
-				            li.style.display = 'block';
-				        } else {
-				            li.style.display = 'none';
-				        }
-				    }
+			        var cId      = li.getAttribute('id');
+			        console.log(`Elemento ${index}: data-esquema = ${esquemas}`,`Id=${cId}`);
+
+			        if (esquemas != null) {
+			            if (esquemas.includes(vEsquema)) {
+			                console.log(`Elemento ${index} visible`,`Id=${cId}`);
+			                li.style.display = 'block';
+			            } else {
+			                console.log(`Elemento ${index} oculto`,`Id=${cId}*****`);
+			                li.style.display = 'none';
+			            }
+			        } else {
+			            //console.log(`Elemento ${index} sin data-esquema, visible`);
+			            li.style.display = 'block';
+			        }
 			    });
-			}	
+			    */
+				// Oculta o Despliega los submenus de cada Opción principal, de acuerdo al ROL
+				vEsquema = document.getElementById("nomEsquema").value.toUpperCase().substring(0,3);
+				//console.log(`Esquema=${vEsquema}`);
+				if (vEsquema!="ADM"){ // El administrador puede ver todo
+				    document.querySelectorAll('li').forEach(function(li) {
+				        var esquemas = li.getAttribute('data-esquema');
+				        if (esquemas!=null){// Algunos li no tienen data-esquema
+					        //console.log(`Esquema=${esquemas}`);
+					        if (esquemas.includes(vEsquema)) {
+					            li.style.display = 'block';
+					        } else {
+					            li.style.display = 'none';
+					        }
+					    }
+				    });
+				}
+
+			}
+
+			document.addEventListener('DOMContentLoaded', function() {
+			    actualizarMenus();
+			});
+				
 		</script>

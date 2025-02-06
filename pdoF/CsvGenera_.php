@@ -20,15 +20,17 @@ function EnviaCsv(&$regreso){
     try{
         // Datos que se deben pasar 
         $datos               = $regreso["opcion"];
-        $cTabla  		     = trim($datos["tabla"]);		// Nombre de la tabla PostgreSQL
-        $cCampos 		     = trim($datos["campos"]);		// campos de la tabla a mostrar en el HTML
-        $join			     = trim($datos["join"]);         // Si hay relación entre 2 o mas tablas
-        $order 			     = trim($datos["order"]);        // Orden en que saldrá la información
-        $id 	 		     = trim($datos["id"]);			// campo o campo id para hecer un count
-        $campo	 		     = trim($datos["busca"]);		// Texto a Buscar
-        $tipos			     = explode(",",$datos["tipos"]); // Tipo de los campos( C-Caracter , D-Fecha )
+        $cTabla  		     = trim($datos["tabla"]);         // Nombre de la tabla PostgreSQL
+        $cCampos 		     = trim($datos["campos"]);        // campos de la tabla a mostrar en el HTML
+        $join			     = trim($datos["join"]);          // Si hay relación entre 2 o mas tablas
+        $order 			     = trim($datos["order"]);         // Orden en que saldrá la información
+        $id 	 		     = trim($datos["id"]);			  // campo o campo id para hecer un count
+        $campo	 		     = trim($datos["busca"]);		  // Texto a Buscar
+        $cCtaI               = trim($datos["cuentaI"]);       // Cuenta Inicial
+        $cCtaF               = trim($datos["cuentaF"]);       // Cuenta Final
+        $tipos			     = explode(",",$datos["tipos"]);  // Tipo de los campos( C-Caracter , D-Fecha )
         $totalFiltro         = 0;
-        $filename 	         = "../csv/" . $datos["csv"];   // "../csv/buscaMovs.csv";
+        $filename 	         = "../csv/" . $datos["csv"];     // "../csv/buscaMovs.csv";
         $regreso["archivo"]  = 'csv/' . $datos["csv"];
         $where               = '';
 
@@ -55,63 +57,71 @@ function EnviaCsv(&$regreso){
             }
         }
 
-       // Se requiere consultar el número de registros por si hay que traer por pedazos la información
-        $sql		    = "SELECT count($id) as numreg1 FROM $cTabla $where " ;
-        $res1 		    = ejecutaSQL_conn_pg($conn_pg,$sql);
-        $totalFiltro    = (int)$res1[0]["numreg1"];
-        $regreso["sql"] = $sql;
-
-        if ($totalFiltro === 0) {
-            $regreso["mensaje"] = "No existe información, con los datos solicitados";
-            return false; // No hay información
-        }
-        
-        $file	= fopen($filename, 'w');
+        $file   = fopen($filename, 'w');
+        $aCtas = arregloCtasBancarias($cCtaI,$cCtaF);
+        // Parámetros para la paginación
+        $loteTamano = 100000; // Número de registros por lote, este dato se obtuvo al hacer pruebas a partir de la cual
+                              // no aparece el error Allowed memory size of 536870912 bytes exhausted
         // quita el alias de la tabla a.cheque por cheque, a.idcuenta por idcuenta
         for($i=0;$i<count($columns);$i++){
             $columns[$i] = preg_replace('/[a-z]+\./', '', $columns[$i]);
         }
         fputcsv($file, $columns); // Imprime los encabezados del archivo CSV
-        // Parámetros para la paginación
-        $loteTamano = 100000; // Número de registros por lote, este dato se obtuvo al hacer pruebas a partir de la cual
-                              // no aparece el error Allowed memory size of 536870912 bytes exhausted
-        $totalLotes = ceil($totalFiltro / $loteTamano);
 
-        for ($lote = 0; $lote < $totalLotes; $lote++) {
-            $offset = $lote * $loteTamano;
+        foreach($aCtas as $cta){
+            $cCta   = $cta["idcuentabancaria"];
+            $cTabla = "atablas.t_" . $cCta ." a ";
+           // Se requiere consultar el número de registros por si hay que traer por pedazos la información
+            $sql		    = "SELECT count($id) as numreg1 FROM $cTabla $where " ;
+            $res1 		    = ejecutaSQL_conn_pg($conn_pg,$sql);
+            $totalFiltro    += (int)$res1[0]["numreg1"];
+            $regreso["sql"] = $sql;
 
-            // Consulta con paginación
-            $sql                = "SELECT $cCampos FROM $cTabla $where $order LIMIT $loteTamano OFFSET $offset";
-            $resultado          = ejecutaSQL_conn_pg($conn_pg, $sql);
-            $regreso["sql1"]    = $sql;
 
-            // Verifica si hay resultados
-            if ($resultado === false || $resultado === NULL) {
-                continue; // Salta este lote si no hay datos
-            }
+            if ($totalFiltro !== 0) {
 
-            // Procesa y escribe los datos del lote en el archivo
-            foreach ($resultado as $registro) {
-                $aMov = []; // Arreglo para almacenar los valores procesados
-                for ($i = 0; $i < count($registro); $i++) {
-                    $cDato = $registro[$columns[$i]];
-                    // Procesa cada dato según su tipo
-                    if ($tipos[$i] == "C") {
-                        $aMov[] = utf8($cDato);
-                    } elseif ($tipos[$i] == "N") {
-                        $aMov[] = conComas($cDato);
-                    } else {
-                        $aMov[] = $cDato;
+                $totalLotes = ceil($totalFiltro / $loteTamano);
+
+                for ($lote = 0; $lote < $totalLotes; $lote++) {
+                    $offset = $lote * $loteTamano;
+
+                    // Consulta con paginación
+                    $sql                = "SELECT $cCampos FROM $cTabla $where $order LIMIT $loteTamano OFFSET $offset";
+                    $resultado          = ejecutaSQL_conn_pg($conn_pg, $sql);
+                    $regreso["sql1"]    = $sql;
+
+                    // Verifica si hay resultados
+                    if ($resultado === false || $resultado === NULL) {
+                        continue; // Salta este lote si no hay datos
                     }
-                }
-                // Escribe la fila procesada en el archivo CSV
-                fputcsv($file, $aMov);
-            }
-            // Liberar memoria después de procesar cada lote
-            unset($resultado); // Libera el resultado del lote
-            gc_collect_cycles(); // Forzar recolección de basura
-        }
 
+                    // Procesa y escribe los datos del lote en el archivo
+                    foreach ($resultado as $registro) {
+                        $aMov = []; // Arreglo para almacenar los valores procesados
+                        for ($i = 0; $i < count($registro); $i++) {
+                            $cDato = $registro[$columns[$i]];
+                            // Procesa cada dato según su tipo
+                            if ($tipos[$i] == "C") {
+                                $aMov[] = utf8($cDato);
+                            } elseif ($tipos[$i] == "N") {
+                                $aMov[] = conComas($cDato);
+                            } else {
+                                $aMov[] = $cDato;
+                            }
+                        }
+                        // Escribe la fila procesada en el archivo CSV
+                        fputcsv($file, $aMov);
+                    }
+                    // Liberar memoria después de procesar cada lote
+                    unset($resultado); // Libera el resultado del lote
+                    gc_collect_cycles(); // Forzar recolección de basura
+                }
+            }
+        }
+        if ($totalFiltro === 0) {
+            $regreso["mensaje"] = "No existe información, con los datos solicitados";
+            return false; // No hay información
+        }
         fclose($file);
         $regreso["mensaje"] = ""; // "Se generó el archivo $filename";
 /*

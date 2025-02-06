@@ -13,6 +13,7 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     </head>
     <body>
+        
         <form name="EdoPosFinDia" id="EdoPosFinDia" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); // Incluye el menú principal?>
@@ -48,6 +49,18 @@
                                             </div>
                                         </div>
                                     </section>
+                                </section>
+                                <section class="seccion_caja_despliegue_70" id="cuadricula">
+                                    <div class="tabla-con-cuadricula">
+                                        <table class="tablex" id="tablaVacia">
+                                            <thead>
+                                                <tr>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cuerpo">
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </section>
                             </div>
                         </div>

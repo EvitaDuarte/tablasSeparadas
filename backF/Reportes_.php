@@ -105,6 +105,14 @@ try{
 			EstadoCuenta($respuesta);
 		break;
 		// _______________________________________
+		case "InteresesPdf":
+			InteresesPdf($respuesta);
+		break;
+		// _______________________________________
+		case "CtasOF16":
+			CtasOF16($respuesta);
+		break;
+		// _______________________________________
 		default:
 			$respuesta["mensaje"] = "No esta definida en Reportes_.php [" . $vOpc . "]";
 		break;
@@ -125,9 +133,10 @@ function rEdoPosFinDia(&$respuesta){
 	$cCta   = $respuesta["datos"]["cCta"];
 	$cFecha = $respuesta["datos"]["cFecha"];
 	$cSalida= $respuesta["datos"]["salida"];
+	$cTabla = "atablas.t_" . trim($cCta);
 	$sql 	= "select a.referenciabancaria, a.folio, a.beneficiario, a.concepto,a.importeoperacion, b.tipo, ".
 			  " a.idunidad, a.idoperacion, a.idcontrol, a.anioejercicio, a.fechaoperacion " .
-			  "from movimientos a , operacionesbancarias b " .
+			  "from $cTabla a , operacionesbancarias b " .
 			  "where a.idcuentabancaria='$cCta' and a.fechaoperacion='$cFecha' and a.idoperacion=b.idoperacion ".
 			  "order by b.tipo desc, a.fechaalta, a.folio, a.referenciabancaria ";
 	// 
@@ -157,13 +166,14 @@ function rEdoPosFinMensual(&$res){
 		$cFecIni = $res["datos"]["cAnio"] . "-" . $res["datos"]["cMes"] . "-01";
 		$cFecFin = $res["datos"]["cAnio"] . "-" . $res["datos"]["cMes"] . "-" . $res["datos"]["cDias"];
 		$cSalida = $res["datos"]["salida"];
+		$cTabla	 = "atablas.t_" . trim($cCta);
 
 		$res["datos"]["cFecha"] = $cFecIni;
 	    metodos::SaldoAnterior($res); // lo guarda en $res["datos"]["saldoAnterior"]
 
 		$sql 	= "select a.referenciabancaria, a.folio, a.beneficiario, a.concepto,a.importeoperacion, b.tipo, ".
 				  " a.idunidad, a.idoperacion, a.idcontrol, a.anioejercicio,a.fechaoperacion " .
-				  "from movimientos a , operacionesbancarias b " .
+				  "from $cTabla a , operacionesbancarias b " .
 				  "where a.idcuentabancaria='$cCta' and a.fechaoperacion>='$cFecIni' and a.fechaoperacion<='$cFecFin' and a.idoperacion=b.idoperacion ".
 				  "order by a.fechaoperacion, b.tipo desc, a.folio, a.referenciabancaria ";
 
@@ -224,6 +234,168 @@ function traeSaldosAnteriores(&$resp){
 }
 // ________________________________________________________________________________________
 function traeOperacionesHoy(&$resp){
+	global $conn_pg;
+	$cDia  = $resp["datos"]["cFecha"];
+	$cFil  = $resp["datos"]["cTipo"];
+//
+	$where1= "";	 // Todas las cuentas
+	if ($cFil=="A"){ // Solo cuentas activas
+		$where1 = " and c.estatus=true ";
+	}elseif ($cFil=="I"){ // Solo cuentas inactivas
+		$where1 = " and c.estatus=false ";
+	}
+	// Itera sobre todas las tablas de atablas
+	$aSCtas = [];  // Inicializar como un arreglo vacío para almacenar todos los resultados
+	foreach ($resp["aCtas"] as $iCta) {
+		$cCta	= trim($iCta["idcuentabancaria"]);
+		$cTabla = "atablas.t_" .$cCta;
+		$sql	= "select c.idcuentabancaria, b.nombre, b.tipo, sum(a.importeoperacion) ".
+					"from operacionesbancarias b, $cTabla a , cuentasbancarias c " .
+					"where b.idoperacion = a.idoperacion and c.idcuentabancaria=a.idcuentabancaria and a.fechaoperacion='$cDia' ".
+					$where1 . 
+					"group by c.idcuentabancaria, b.nombre, b.tipo ".
+					"order by c.idcuentabancaria, b.tipo desc ";
+		$aSCtas1= ejecutaSQL_conn_pg($conn_pg,$sql);
+	    // Verificar si la consulta devuelve resultados
+    	if ($aSCtas1) {
+	        // Agregar cada fila de los resultados de la consulta a $aSctas1
+	        foreach ($aSCtas1 as $row) {
+	            $aSCtas[] = $row;  // Agrega cada fila al arreglo $aSctas1
+	        }
+	    }
+	}
+	//
+
+
+	$nSaldo = 0.00; $nIngresos = 0.00 ; $nEgresos = 0.00;
+	// Acumular importes del día a los saldos anteriores de cada cuenta
+	$cCtAnt = $aSCtas[0]["idcuentabancaria"];
+	for($i=0;$i<count($aSCtas);$i++){
+		//
+		//
+		$cCtaN = $aSCtas[$i]["idcuentabancaria"];
+		$nImpo = floatval($aSCtas[$i]["sum"]);
+		$cTipo = $aSCtas[$i]["tipo"];
+		if ($cCtAnt!=$cCtaN){// Vacía el saldo en la cuenta anterior correspondiente
+			for ($j=0 ; $j<count($resp["aCtas"]);$j++){
+				if ($cCtAnt==$resp["aCtas"][$j]["idcuentabancaria"]){
+					$nSalAnt = floatval($resp["aCtas"][$j]["saldoAnterior"]);
+					$resp["aCtas"][$j]["SaldoFinal"] = $nSalAnt + $nSaldo;
+				}
+			}			
+			$nSaldo = 0.00;
+			$cCtAnt = $cCtaN;
+		}
+		if ($cTipo=="I"){
+			$nIngresos	+= $nImpo;
+			$nSaldo 	+= $nImpo;
+		}else{
+			$nSaldo		-= $nImpo;
+			$nEgresos	+= $nImpo;
+		}
+	}
+	for ($j=0 ; $j<count($resp["aCtas"]);$j++){
+		if ($cCtAnt==$resp["aCtas"][$j]["idcuentabancaria"]){
+			$nSalAnt = floatval($resp["aCtas"][$j]["saldoAnterior"]);
+			$resp["aCtas"][$j]["SaldoFinal"] = $nSalAnt + $nSaldo;
+		}
+	}
+//
+	$acumuladoPorNombre = [];
+
+	// Recorrer el array original y acumular por nombre de operación
+	foreach ($aSCtas as $cuenta) {
+	    $nombre  = $cuenta['nombre'];
+	    $importe = floatval($cuenta['sum']); // Convertir el importe a número
+	    $tipo    = $cuenta['tipo'];
+
+	    // Verificar si el nombre ya está en el array acumulado
+	    $encontrado = false;
+	    foreach ($acumuladoPorNombre as &$acumulado) { // el & es para que pueda modificar 
+	        if ($acumulado['nombre'] === $nombre && $acumulado['tipo'] === $tipo) {
+	            // Acumular el importe
+	            $acumulado['importe'] += $importe;
+	            $encontrado = true;
+	            break;
+	        }
+	    }
+
+	    if (!$encontrado) {
+	        // Agregar una nueva entrada al array acumulado
+	        $acumuladoPorNombre[] = [
+	            'nombre'  => $nombre,
+	            'importe' => $importe,
+	            'tipo'    => $tipo,
+	        ];
+	    }
+	}
+	$nSalAntCtas = $resp["datos"]["saldosCuentas"];
+	//$resp["acum"] = $acumuladoPorNombre;
+	// Arreglo final para el PDF  number_format($nSaldo, 2, '.', ',');
+	$aPdf = [
+		["a01",utf8("SALDOS EN BANCOS DEL DÍA ANTERIOR"),"", conComas($nSalAntCtas) ],
+		["a02","","",""],
+		["a03","","",""],
+		["b00",utf8("MÁS DEPÓSITOS POR CONCEPTO DE :")		,""		,conComas($nIngresos)],
+		["d00",utf8("MENOS EROGACIONES POR CONCEPTO DE :")	,""		,conComas($nEgresos)]
+	];
+	$nI=1;$nE=1;//Contadores
+	foreach($acumuladoPorNombre as $acum){
+		if ($acum["tipo"]=="I"){
+			$cI   	= sprintf("b%02d", $nI);
+			$aPdf[] = [$cI, utf8($acum["nombre"]), conComas($acum["importe"]), ""];
+			$nI   	+= 1;
+		}else{
+			$cE	  	= sprintf("d%02d", $nE);
+			$aPdf[] = [$cE, utf8($acum["nombre"]), conComas($acum["importe"]), ""];
+			$nE   	+= 1;		
+		}
+	}
+	$aPdf[] = ["c98","","_._",""];
+	$aPdf[] = ["c99","","",""];
+	$aPdf[] = ["d97","","_._",""];
+	$aPdf[] = ["d98","","","_._"];
+	$aPdf[] = ["d99","","",""];
+	$aPdf[] = ["e01",utf8("SALDO DE BANCOS DEL DÍA QUE SE REPORTA :"),"",conComas($nSalAntCtas+$nIngresos-$nEgresos)];
+	$aPdf[] = ["e97","","","_2.2_"];
+	$aPdf[] = ["e98","","",""];
+
+	// Ordenar el arreglo usando la función de comparación
+	usort($aPdf, 'compararPorPrimeraColumna');
+
+	$arrayModificado = [];
+
+	foreach ($aPdf as $subarray) {
+    	// Eliminar el primer elemento
+    	array_shift($subarray);
+    
+    	// Agregar el subarray modificado al nuevo array
+    	$arrayModificado[] = $subarray;
+	}
+	$resp["aPdf"] = $arrayModificado;
+//	Verificar si hay Saldo final en el arreglo
+	for ($j=0 ; $j<count($resp["aCtas"]);$j++){
+		if ( !isset($resp["aCtas"][$j]["SaldoFinal"]) ){
+			$resp["aCtas"][$j]["SaldoFinal"] = $resp["aCtas"][$j]["saldoAnterior"];
+		}
+	}
+//	
+	$arrayModificado 	= []; $nTotal=0.00;
+	$arrayModificado[]	= ["","RESUMEN DE SALDOS POR BANCO"	,"CHEQUES", utf8("*INVERSIÓN"), "TOTAL"	];
+	$arrayModificado[]	= ["",""							,""		  , ""						 , ""		];
+	//print_r($resp["aCtas"]);
+	foreach($resp["aCtas"] as $w){
+		$nTotal				+= $w["SaldoFinal"];
+		$arrayModificado[]  = [$w["idcuentabancaria"], utf8(substr($w["nombre"],0,22)) , conComas($w["SaldoFinal"]) , "" , conComas($w["SaldoFinal"]) ];
+	}
+	$arrayModificado[] = [ "" , "" 			, "_._" , "_._" , "_._"];
+	$arrayModificado[] = [ "" , "T O T A L" , conComas($nTotal) , "" , conComas($nTotal)];
+	$arrayModificado[] = [ "" , "" 			, "_2.2_" , "_2.2_" , "_2.2_"];
+	$resp["aCtas1"]    = $arrayModificado;
+
+}
+// ________________________________________________________________________________________
+function traeOperacionesHoyBorrarDespues(&$resp){
 	global $conn_pg;
 	$cDia  = $resp["datos"]["cFecha"];
 	$cFil  = $resp["datos"]["cTipo"];
@@ -395,13 +567,14 @@ function imprimeCheque(&$respuesta){
 	$cCta 	= $respuesta["datos"]["idCuenta"]; 
 	$sql 	= "select * from frx where idcuentabancaria='$cCta' order by posicion";
 	$aVal	= ejecutaSQL_($sql);
+	$cTabla = "atablas.t_" . trim($cCta);
 	if ($aVal!=null){
 
 		$respuesta["resultados"] = $aVal;
 
 		$cId  = $respuesta['datos']['idCheque']; 
 		$sql  = "select fechaoperacion as fecha, beneficiario, importeoperacion as importe, concepto, " .
-			    "referenciabancaria as cheque, folio as somire from movimientos where idmovimiento=$cId ";
+			    "referenciabancaria as cheque, folio as somire from $cTabla where idmovimiento=$cId ";
 		$aVal = ejecutaSQL_($sql);
 		$aVal[0]["fecha"]   = fechaLetra($aVal[0]["fecha"]);
 		$respuesta["opera"] = $aVal;
@@ -420,6 +593,7 @@ function ImpresionRangoCheques(&$res){
 		$cCta	= $res["datos"]["idCuenta"];
 		$sql 	= "select * from frx where idcuentabancaria='$cCta' order by posicion";
 		$aVal	= ejecutaSQL_($sql);
+		$cTabla = "atablas.t_" . trim($cCta);
 		if ($aVal!==null){
 			$conv	 			= new NumeroALetras();
 			$conv->apocope 		= true;
@@ -428,7 +602,7 @@ function ImpresionRangoCheques(&$res){
 			$cCheIni = $res["datos"]["cheIni"];
 			$cCheFin = $res["datos"]["cheFin"];
 			$sql	 = "select fechaoperacion as fecha, beneficiario, importeoperacion as importe, concepto, " .
-				       "referenciabancaria as cheque, folio as somire, 'letra' as letraImp from movimientos where  " .
+				       "referenciabancaria as cheque, folio as somire, 'letra' as letraImp from $cTabla where  " .
 				       "referenciabancaria>='$cCheIni' and referenciabancaria<='$cCheFin' and idcuentabancaria='$cCta' ".
 				       "order by referenciabancaria";
 			$aVal 	 = ejecutaSQL_($sql);
@@ -459,14 +633,15 @@ function revisaCheque(&$respuesta){
 		$cCheque = pg_escape_string($cCheque);
 		$cCta	 = $respuesta["datos"]["idCuenta"];
 		$cId  	 = $respuesta['datos']['idCheque']; 
-		$sql 	 = "select referenciabancaria as cheque from movimientos where idcuentabancaria='$cCta' and referenciabancaria='$cCheque'";
+		$cTabla	 = "atablas.t_" . trim($cCta);
+		$sql 	 = "select referenciabancaria as cheque from $cTabla where idcuentabancaria='$cCta' and referenciabancaria='$cCheque'";
 		$aVal	 = ejecutaSQL_($sql);
 
 		if ($aVal!==null){  // Ya existe el cheque
 			$respuesta["mensaje"] ="Ya existe el cheque $cCheque ... revise";
 			return false;
 		}
-		$sql = "update movimientos set referenciabancaria='$cCheque', estatus='I' where idcuentabancaria='$cCta' and idmovimiento=$cId";
+		$sql = "update $cTabla set referenciabancaria='$cCheque', estatus='I' where idcuentabancaria='$cCta' and idmovimiento=$cId";
 		if ( actualizaSql($sql) > 0 ){
 			imprimeCheque($respuesta);
 		}else{
@@ -484,7 +659,8 @@ function revisaCheque(&$respuesta){
 function existeCheque(&$respuesta){
 	$cCheque = $respuesta["datos"]["numCheque"];
 	$cCta	 = $respuesta["datos"]["idCuenta"];
-	$sql 	 = "select referenciabancaria as cheque from movimientos where idcuentabancaria='$cCta' and referenciabancaria='$cCheque'";
+	$cTabla  = "atablas.t_" . trim($cCta);
+	$sql 	 = "select referenciabancaria as cheque from $cTabla where idcuentabancaria='$cCta' and referenciabancaria='$cCheque'";
 	$aVal	 = ejecutaSQL_($sql);
 
 	if ($aVal==null){  // No existe el cheque
@@ -681,5 +857,20 @@ function xlsEdoPosFinMensual(&$res){
 	xlsEdoPosFinDia($res,true);
 }
 // ________________________________________________________________________________________
+function InteresesPdf(&$res){
+	require_once("repo/InteresesPdf_.php");
+	$sql 		 = "select idunidad, nombreunidad from public.unidades where estatus=true " .
+				   " and ctas_intereses is not null and idunidad!='OF16' order by idunidad ";
+	$aVal		 = ejecutaSQL_($sql);
+	$res["ctas"] = $aVal;
+	$mensaje	 = "";
+
+	$res["success"] = pdfReporteSaldos($res);
+}
+// ________________________________________________________________________________________
+function CtasOF16(&$res){
+	metodos::CtasOF16($res); // Se guarda en $res["resultados"], las cuentas pertenecientes a OF16
+}
+// ________________________________________________________________________________________
 //
-?>
+?> 

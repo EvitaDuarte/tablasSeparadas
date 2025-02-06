@@ -53,12 +53,41 @@ Azul oscuro - rgb (15,26,47) - 0F1A2F
     font-size: 14px;
     display:inline-block;
 }
+.caja_captura2{
+    width: 10% !important; 
+    margin:2px 2px 2px 2px;
+    padding: 2px 2px 2px 2px;
+    font-size: 14px;
+    display:inline-block;
+}
+.caja_captura3{
+    min-width: 30%; 
+    width: min-content  !important;
+    margin:1px 1px 1px 1px;
+    padding: 1px 1px 1px 1px;
+    font-size: 14px;
+    display:inline-block;
+}
 .caja_captura label{
 	color: rgb(149,0,84);
 	display: block;
 	width: 90%;
 	font-weight: bold;
 	margin-bottom: 4px;
+}
+.caja_captura1 label{
+    color: rgb(149,0,84);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.caja_captura3 label{
+    color: rgb(149,0,84);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    margin-bottom: 4px;
 }
 .caja_captura_check{
     color: rgb(149,0,84);
@@ -75,13 +104,6 @@ Azul oscuro - rgb (15,26,47) - 0F1A2F
     font-weight: bold;
     margin-bottom: 4px;
 }
-.caja_captura1 label{
-    color: rgb(149,0,84);
-    display: block;
-    width: 90%;
-    font-weight: bold;
-    margin-bottom: 4px;
-}
 .caja_captura select{
 	color: rgb(29,29,27);
 	display: block;
@@ -90,6 +112,13 @@ Azul oscuro - rgb (15,26,47) - 0F1A2F
 	font-size: 16px;
 }
 .caja_captura1 select{
+    color: rgb(29,29,27);
+    display: block;
+    width: 90%;
+    font-weight: bold;
+    font-size: 16px;
+}
+.caja_captura3 select{
     color: rgb(29,29,27);
     display: block;
     width: 90%;
@@ -111,13 +140,7 @@ Azul oscuro - rgb (15,26,47) - 0F1A2F
     font-weight: bold;
     font-size: 14px;
 }
-.caja_captura2{
-    width: 10% !important; 
-    margin:2px 2px 2px 2px;
-    padding: 2px 2px 2px 2px;
-    font-size: 14px;
-    display:inline-block;
-}
+
 .caja_captura2 label{
     color: rgb(149,0,84);
     display: block;

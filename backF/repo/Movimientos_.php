@@ -22,7 +22,11 @@ function EnviaPdf(&$regreso){
         $id 	 		     = trim($datos["id"]);			// campo o campo id para hecer un count
         $campo	 		     = trim($datos["busca"]);		// Texto a Buscar
         $tipos			     = explode(",",$datos["tipos"]); // Tipo de los campos( C-Caracter , D-Fecha )
+        $cCtaI               = trim($datos["cuentaI"]);       // Cuenta Inicial
+        $cCtaF               = trim($datos["cuentaF"]);       // Cuenta Final
         $totalFiltro         = 0;
+        $totalGral           = 0.00;
+        $nTotal              = 0.00;
         $where               = '';
         $lCreaPdf            = true;
         //
@@ -34,10 +38,12 @@ function EnviaPdf(&$regreso){
         $cCta1               = $cCta2 = ""; 
         $aAnchos             = array(16, 34, 31, 11, 23, 102 , 22, 32 ); 
         $order               = " order by idcuentabancaria , fechaoperacion desc";
+        $loteTamano          = 100000;  // Número de registros por lote, este dato se obtuvo al hacer pruebas a partir de la cual
+                                        // no aparece el error Allowed memory size of 536870912 bytes exhausted
 
-    //
+        //
         $campo 	 = pg_escape_string($conn_pg, $campo); 
-    //
+        //
         if ( isset($datos["aCampos"])){ // Se definieron los campos en $datos["aCampos"]
             $aCampos = $datos["aCampos"];
             $columns = $aCampos; //explode(",", $cCampos);
@@ -45,7 +51,7 @@ function EnviaPdf(&$regreso){
             $columns = explode(",", $cCampos);
             $aCampos = $columns;
         }
-    //  Si hay texto a buscar empezar a construir el where 
+        //  Si hay texto a buscar empezar a construir el where 
         if ($campo != null && $campo!="") {
             $where = construye_where($campo, $aCampos,$tipos);
         }
@@ -57,101 +63,119 @@ function EnviaPdf(&$regreso){
             }
         }
 
-         // quita el alias de la tabla a.cheque por cheque, a.idcuenta por idcuenta
+        // quita el alias de la tabla a.cheque por cheque, a.idcuenta por idcuenta
         for($i=0;$i<count($columns);$i++){
             $columns[$i] = preg_replace('/[a-z]+\./', '', $columns[$i]);
         }
 
-       // Se requiere consultar el número de registros por si hay que traer por pedazos la información
-        $sql		    = "SELECT count($id) as numreg1 FROM $cTabla $where " ;
-        $res1 		    = ejecutaSQL_conn_pg($conn_pg,$sql);
-        $totalFiltro    = (int)$res1[0]["numreg1"];
-        $regreso["sql"] = $sql;
+        $aCtas = arregloCtasBancarias($cCtaI,$cCtaF);
+        foreach($aCtas as $cta){
+            $cCta   = $cta["idcuentabancaria"];
+            $cTabla = "atablas.t_" . $cCta ." a ";
 
+            // Se requiere consultar el número de registros por si hay que traer por pedazos la información
+            $sql		    = "SELECT count($id) as numreg1 FROM $cTabla $where " ;
+            $res1 		    = ejecutaSQL_conn_pg($conn_pg,$sql);
+            $totalFiltro    += (int)$res1[0]["numreg1"];
+            $regreso["sql"] = $sql;
+
+            if ($totalFiltro !== 0) {
+
+                $totalLotes = ceil($totalFiltro / $loteTamano);
+                $nTotal     = 0.00;
+                for ($lote = 0; $lote < $totalLotes; $lote++) {
+                    $offset = $lote * $loteTamano;
+
+                    // Consulta con paginación
+                    $sql                = "SELECT $cCampos FROM $cTabla $where $order LIMIT $loteTamano OFFSET $offset";
+                    $resultado          = ejecutaSQL_conn_pg($conn_pg, $sql);
+                    $regreso["sql1"]    = $sql;
+
+                    // Verifica si hay resultados
+                    if ($resultado === false || $resultado === NULL) {
+                        continue; // Salta este lote si no hay datos
+                    }
+
+                    if ($lCreaPdf){
+                        creaPdf($pdf);
+                        Encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos,"");
+                        $lCreaPdf = false; // Solo una vez
+                    }
+                    if ( $pdf->GetY() + 10 > $pdf->h ){
+                        encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+                    }
+                    imprimeCta($pdf,$cCta,$aAnchos);
+                    // Procesa y escribe los datos del lote en el archivo
+                    foreach ($resultado as $registro) {
+                        $aMov = []; // Arreglo para almacenar los valores procesados
+                        
+                        for ($i = 0; $i < count($registro); $i++) {
+                            $cDato = trim($registro[$columns[$i]]);
+                            // Procesa cada dato según su tipo
+                            if ($tipos[$i] == "C") {
+                                $aMov[] = utf8($cDato);
+                            } elseif ($tipos[$i] == "N") {
+                                $aMov[] = conComas($cDato);
+                                if ($i===3){
+                                    $nMonto = (float)($cDato); 
+                                }
+                            } else {
+                                $aMov[] = $cDato;
+                            }
+                        }
+                        // Escribe la fila procesada en el archivo CSV
+                        $regreso["movs"] = $aMov;
+                        $cCta1 = $aMov[0];
+                        if ( $cCta1!==$cCta1){
+                            /*
+                            if ($cCta2!==""){ // Imprimir total de la Cta Anterior
+                                if ( $pdf->GetY() + 10 > $pdf->h ){
+                                    encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+                                    imprimeCta($pdf,$cCta2,$aAnchos);
+                                }
+                                imprimeTotal($pdf,$nTotal,$cCta2,$aAnchos);
+                                $nTotal = 0.00;
+                            }
+                            $cCta2 = $cCta1;
+                            if ( $pdf->GetY() + 10 > $pdf->h ){
+                                encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+                            }
+                            imprimeCta($pdf,$cCta1,$aAnchos);
+                            */
+                        }
+                        if ( $pdf->GetY() + 10 > $pdf->h ){
+                            encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+                            imprimeCta($pdf,$cCta,$aAnchos);
+                        }
+                        $nTotal += $nMonto;
+                        imprimeMov($pdf,$aMov,$aAnchos);
+                        //return true;
+                    }
+                    //
+                    if ( $pdf->GetY() + 10 > $pdf->h ){
+                        encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+                        imprimeCta($pdf,$cCta,$aAnchos);
+                    }
+                    $totalGral += $nTotal;
+                    imprimeTotal($pdf,$nTotal,$cCta1,$aAnchos);
+                    // Liberar memoria después de procesar cada lote
+                    unset($resultado); // Libera el resultado del lote
+                    gc_collect_cycles(); // Forzar recolección de basura
+                }
+            }
+        }
+        if ( $pdf->GetY() + 10 > $pdf->h ){
+            encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
+            // imprimeCta($pdf,$cCta,$aAnchos);
+        }
+        imprimeTotal($pdf,$totalGral," ",$aAnchos,"TOTAL GENERAL");
+        if ($lCreaPdf===false){
+            cierraPdf($pdf,$regreso);
+        }
         if ($totalFiltro === 0) {
             $regreso["mensaje"] = "No existe información, con los datos solicitados";
             return false; // No hay información
         }
-
-        // Parámetros para la paginación
-        $loteTamano = 100000; // Número de registros por lote, este dato se obtuvo al hacer pruebas a partir de la cual
-                              // no aparece el error Allowed memory size of 536870912 bytes exhausted
-        $totalLotes = ceil($totalFiltro / $loteTamano);
-        $nTotal     = 0.00;
-        for ($lote = 0; $lote < $totalLotes; $lote++) {
-            $offset = $lote * $loteTamano;
-
-            // Consulta con paginación
-            $sql                = "SELECT $cCampos FROM $cTabla $where $order LIMIT $loteTamano OFFSET $offset";
-            $resultado          = ejecutaSQL_conn_pg($conn_pg, $sql);
-            $regreso["sql1"]    = $sql;
-
-            // Verifica si hay resultados
-            if ($resultado === false || $resultado === NULL) {
-                continue; // Salta este lote si no hay datos
-            }
-
-            if ($lCreaPdf){
-                creaPdf($pdf);
-                Encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos,"");
-                $lCreaPdf = false; // Solo una vez
-            }
-
-            // Procesa y escribe los datos del lote en el archivo
-            foreach ($resultado as $registro) {
-                $aMov = []; // Arreglo para almacenar los valores procesados
-                
-                for ($i = 0; $i < count($registro); $i++) {
-                    $cDato = trim($registro[$columns[$i]]);
-                    // Procesa cada dato según su tipo
-                    if ($tipos[$i] == "C") {
-                        $aMov[] = utf8($cDato);
-                    } elseif ($tipos[$i] == "N") {
-                        $aMov[] = conComas($cDato);
-                        if ($i===3){
-                            $nMonto = (float)($cDato); 
-                        }
-                    } else {
-                        $aMov[] = $cDato;
-                    }
-                }
-                // Escribe la fila procesada en el archivo CSV
-                $regreso["movs"] = $aMov;
-                $cCta1 = $aMov[0];
-                if ( $cCta1!==$cCta2){
-                    if ($cCta2!==""){ // Imprimir total de la Cta Anterior
-                        if ( $pdf->GetY() + 10 > $pdf->h ){
-                            encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
-                            imprimeCta($pdf,$cCta2,$aAnchos);
-                        }
-                        imprimeTotal($pdf,$nTotal,$cCta2,$aAnchos);
-                        $nTotal = 0.00;
-                    }
-                    $cCta2 = $cCta1;
-                    if ( $pdf->GetY() + 10 > $pdf->h ){
-                        encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
-                    }
-                    imprimeCta($pdf,$cCta1,$aAnchos);
-                }
-                if ( $pdf->GetY() + 10 > $pdf->h ){
-                    encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
-                    imprimeCta($pdf,$cCta1,$aAnchos);
-                }
-                $nTotal += $nMonto;
-                imprimeMov($pdf,$aMov,$aAnchos);
-                //return true;
-            }
-            //
-            if ( $pdf->GetY() + 10 > $pdf->h ){
-                encabezado1($pdf,$letrero1,"",$letrero2,$aAnchos);
-                imprimeCta($pdf,$cCta1,$aAnchos);
-            }
-            imprimeTotal($pdf,$nTotal,$cCta1,$aAnchos);
-            // Liberar memoria después de procesar cada lote
-            unset($resultado); // Libera el resultado del lote
-            gc_collect_cycles(); // Forzar recolección de basura
-        }
-        cierraPdf($pdf,$regreso);
         $regreso["mensaje"] = ""; // "Se generó el archivo pdf";
     }catch(Exception $e){
         $datos["mensaje"] = $e->getMessage();
@@ -173,9 +197,9 @@ function imprimeCta($pdf,$cCta,$aAnchos){
     $pdf->SetWidths($aAnchos);
 }
 // _________________________________________________________________________________
-function imprimeTotal($pdf,$nTotal,$cCta,$aAncho){
+function imprimeTotal($pdf,$nTotal,$cCta,$aAncho,$cTit="TOTAL CUENTA"){
     $nCol1  = $aAncho[0] + $aAncho[1] + $aAncho[2] + $aAncho[3] + $aAncho[4] + $aAncho[5];
-    $aRen   = array(str_pad("TOTAL CUENTA", $nCol1, " ", STR_PAD_LEFT),$cCta,conComas($nTotal));
+    $aRen   = array(str_pad($cTit, $nCol1, " ", STR_PAD_LEFT),$cCta,conComas($nTotal));
     $pdf->SetWidths(array($nCol1,$aAncho[6],$aAncho[7]));
     $pdf->SetAligns(['R','L', 'R']);
     $pdf->Row($aRen);

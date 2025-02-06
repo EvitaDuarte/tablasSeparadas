@@ -1185,7 +1185,7 @@ function validaFecha(dFecha,cIdFecha,lHoy){
     //con sole.log("FechaCap["+cFechaCap+"] FechaHoy["+cFechaHoy+"]["+dHoy+"]");
     cObj = document.getElementById(cIdFecha);
     if ( cFechaCap < cFechaHoy ){
-        if (cEsquema!="Administrador"){
+        if (gEsquema!="Administrador"){
             //cObj.value = fddmmyyyy(dHoy,'-');
             //re cuperaValorOriginal("idFecha");
             //cObj.blur();
@@ -1391,7 +1391,7 @@ const seleccionaTexto = (event) => {
 }
 // __________________________________________________________________________________
 const validaAnio =(inputAnio) =>{
-    cAnio    = inputAnio.value.trim();
+    cAnio    = inputAnio.trim();
     cAnioHoy = dHoy.substring(0,4)
     if (cAnio==""){
         return true;
@@ -1467,7 +1467,7 @@ const fechaXLS = (cFechaNumero,cSeparador="-") =>{ // Regresa la fecha, de acuer
         let anio = fechaExcel.getFullYear();
 
         let fechaFormateada = `${anio}${cSeparador}${mes}${cSeparador}${dia}`;
-        console.log("Fecha Formateada: ",cFechaNumero,"->" ,fechaFormateada);
+        // console.log("Fecha Formateada: ",cFechaNumero,"->" ,fechaFormateada);
 
         // Asigna la fecha formateada a la variable cFecha
         cFechaNumero = fechaFormateada;

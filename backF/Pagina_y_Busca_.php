@@ -96,6 +96,7 @@ function BuscaYPagina(&$datos){
 	// Se requiere consultar el número de registros sin el limit
 
 	$sql		  = "SELECT count($id) as numreg1 FROM $cTabla $where " ;
+	// $datos["depura"] = $sql;
 	$res 		  = ejecutaSQL_conn_pg($conn_pg,$sql);
 	$totalFiltro  = $res[0]["numreg1"];
 	$datos["sql"] = $sql;

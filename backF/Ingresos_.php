@@ -244,7 +244,7 @@ function ModificaMovimiento(&$respuesta){
 	$cFecha				= $respuesta["opcion"]["idFecha"];
 	$oMov    			= new MovimientoBancario(null);	// Se crea un objeto Movimiento bancario
 	$cId				= $respuesta["opcion"]["idMovimiento"];
-	$aMovOri 			= $oMov->traeMovimientoxId( $conn_pdo, $cId )[0];// Regresa un arreglo de un solo elemento
+	$aMovOri 			= $oMov->traeMovimientoxId( $conn_pdo, $cId , $cCtaBan )[0];// Regresa un arreglo de un solo elemento
 	$respuesta["ctrl"]  = $aMovOri; // para depurar
 	$nImpoOri			= $aMovOri["importeoperacion"];
 	$cFechaOri			= ddmmyyyy($aMovOri["fechaoperacion"]);
@@ -497,7 +497,7 @@ function cancelaMovsCorrectos(&$respuesta){
 	$nMovsCance = 0;
 	$oMov		= new MovimientoBancario(null);	// Se crea un objeto Movimiento bancario
 	foreach($aMovsCance as $aCance){
-		if ($aCance["estatus"]==""){
+		if ($aCance["estatus"]===""){
 //
 			$cCta									 = trim($opcion["ctBancaria"]);
 			$aMovOri								 = $oMov->traeMovimientoxId($conn_pdo,$aCance["idMov"],$cCta)[0];
@@ -552,7 +552,7 @@ function movsCanceIncorrectos(&$respuesta){
             	if ($impoBd==$impoTxt){
             		// Fecha menor a la del movimiento o de años anteriores
             		if( ($fechaTxt < $fechaMov) || ( ($cYear-$cAnioMov)>4 ) ){
-						$respuesta["opcion"]["aDatoCance"][$i]["estatus"] ="F"; 
+						$respuesta["opcion"]["aDatoCance"][$i]["estatus"] ="F $fechaTxt $fechaMov"; 
             		}else{
             			$respuesta["opcion"]["aDatoCance"][$i]["idMov"] = $aMov[0]["idmovimiento"];
             		}
