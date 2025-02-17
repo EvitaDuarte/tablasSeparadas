@@ -59,13 +59,20 @@
                                 <section class="seccion_caja" id="botones">
                                     <div class="caja_captura">
                                         <div class="form-field-button_" id="grpBotones">
-                                                <a class="btn_1 efecto" onclick="expoPdf();">
-                                                    <span>PDF</span>
-                                                </a>
+                                            <a class="btn_1 efecto" onclick="expoPdf();">
+                                                <span>PDF</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="caja_captura" style="display: none;" id="cajaLayOut">
+                                        <div class="form-field-button_" id="grpBotones">
+                                            <a class="btn_1 efecto" onclick="expoXLS();">
+                                                <span>LayOut Recibos</span>
+                                            </a>
                                         </div>
                                     </div>
                                 </section>
-                                <section class="seccion_caja_despliegue_70" id="cuadricula">
+                                <section class="seccion_caja_despliegue_70" id="cuadriInteres">
                                     <div class="tabla-con-cuadricula">
                                         <table class="tablex" id="tablaVacia">
                                             <thead>
@@ -85,6 +92,26 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="cuerpo">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </section>
+                                <section class="seccion_caja_despliegue_70" id="cuadriRespuesta" style="display:none;">
+                                    <div class="tabla-con-cuadricula">
+                                        <table class="tablex" id="tablaRespuesta">
+                                            <thead>
+                                                <tr>
+                                                    <th>UR</th>
+                                                    <th>UR Suc</th>
+                                                    <th>UrCta</th>
+                                                    <th>CtaOFC</th>
+                                                    <th>Operación</th>
+                                                    <th>Importe</th>
+                                                    <th>Fecha</th>
+                                                    <th>Operador</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="cuerpoR">
                                             </tbody>
                                         </table>
                                     </div>
@@ -141,5 +168,6 @@
         <script src="jsF/cerrarSesion_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Reportes_.js"></script>
+        <script src="assetsF/js/xlsx.mini.min.js"></script>
     </body>
 </html>

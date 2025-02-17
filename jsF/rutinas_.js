@@ -1478,4 +1478,25 @@ const fechaXLS = (cFechaNumero,cSeparador="-") =>{ // Regresa la fecha, de acuer
 
 }
 // __________________________________________________________________________________
+function agregarComas(numero) {
+  // Convertir el número a un string (si no es ya un string)
+  let numStr = String(numero);
+  
+  // Usamos una expresión regular para insertar las comas
+  return numStr.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+// __________________________________________________________________________________
+// Función para obtener el nombre del mes
+const getMonthName = (month) => {
+    const months = [
+        "ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", 
+        "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"
+    ];
+    return months[parseInt(month) - 1];
+}
+// __________________________________________________________________________________
+const parseImporte = (importeStr) => {
+    // Eliminar las comas y convertir a número
+    return parseFloat(importeStr.replace(/,/g, ''));
+}
 // __________________________________________________________________________________

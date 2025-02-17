@@ -3,9 +3,9 @@ define('Letra', 'Helvetica');
 require('../assetsF/php/fpdf/mc_table.php');
 //require('rutinas.php'); ya se invoco en reportes_.php
 
-function pdfReporteIntereses(&$res){
+function pdfInteresesRespuesta(&$res){
 	global $aAnchos, $nTotJle;
-	$aAnchos =  array(15, 95 , 50 , 40 );
+	$aAnchos =  array(10, 95 , 30 ,25, 40 );
 	// ___________________
 	$datos = $res["opcion"]["aRes"];$ctas = $res["ctas"]; 	
 	// ___________________
@@ -15,15 +15,16 @@ function pdfReporteIntereses(&$res){
 	// ___________________
 	try {
         ob_start();
-        $cMes = substr( $datos[0]["a11_Fecha"] , 2,2);
+        $cMes = substr( $datos[0]["fecha"] , 2,2);
         $cMes = (int)$cMes;
-        $cMes = "INTERESES " . strtoupper(mesesEspanol($cMes));
+        $cMes = "RESPUESTA " . strtoupper(mesesEspanol($cMes));
 		// ___________________
 	    $pdf = new PDF_MC_Table('P','mm','Letter');
 	    $pdf->SetTopMargin(7);
 	    $pdf->SetAutoPageBreak(true, 1); 	// 1 de margen inferior para el footer y que detecte salto de página $pdf->GetY() + 10 > $pdf->h
-	    imprimeJuntas($pdf,$datos,$ctas,$cMes);
-	    imprimeDtos($pdf,$datos,$ctas,$cMes,$res);
+	    //imprimeJuntas($pdf,$datos,$ctas,$cMes);
+	    //imprimeDtos($pdf,$datos,$ctas,$cMes,$res);
+	    imprimeDatos($pdf,$datos,$ctas,$cMes,$res);
 	    // ___________________
  		ob_end_clean();
 	    $ip 		  = ipRepo();
@@ -40,12 +41,45 @@ function pdfReporteIntereses(&$res){
 	    return true;
 	    // ___________________
 	} catch (Exception $e) {
-		$mensaje = "No se logro generar la información solicitada";
+		$res["mensaje"]  = "No se logro generar la información solicitada " . $e->getMessage();
 		return false;
 	}	
 }
 // ______________________________________________________________________________________________________
-function imprimeJuntas($pdf,$datos,$ctas,$cMes){
+function imprimeDatos($pdf,$datos,$ctas,$cMes){
+	global $nTotGral;
+	$nPag = 1;
+	encabezado($pdf,$nPag,$cMes);
+	foreach ($datos as $jle ) {
+		$cUr	 = $jle["ur"];
+		$cNombre = buscaUr($cUr,$ctas);
+		$cNombre = substr($cNombre, 0,60);
+		$noCta 	 = ltrim($jle["ur_cta"],"0");
+		$opera	 = $jle["operacion"];
+		$cImpo	 = $jle["importe"];
+		$nImpo   = (float) str_replace(",", "", $cImpo);
+		$nTotGral+= $nImpo;
+
+		if ( $pdf->GetY() + 10 > $pdf->h ){
+        	$nPag++;
+			encabezado($pdf,$nPag,$cMes);
+		}
+
+        $aRen  = array($cUr,$cNombre,$noCta,$opera,conComas($nImpo));
+		$pdf->RowSinCuadro($aRen);
+
+	}
+
+	if ( $pdf->GetY() + 10 > $pdf->h ){
+    	$nPag++;
+		encabezado($pdf,$nPag,$cMes);
+	}
+	$pdf->SetFont(Letra, 'B', 8);
+    $aRen  = array("","","","Total General",conComas($nTotGral));
+	$pdf->RowSinCuadro($aRen);
+}
+// ______________________________________________________________________________________________________
+/* function imprimeJuntas($pdf,$datos,$ctas,$cMes){
 	global $nTotJle;
 	$nPag = 1; $nTot = 0.00;
 	encabezado($pdf,$nPag,$cMes);
@@ -129,7 +163,7 @@ function imprimeDtos($pdf,$datos,$ctas,$cMes){
 	$pdf->RowSinCuadro($aRen);
 	$aRen  = array("","","TOTAL GENERAL",conComas($nTot+$nTotJle));
 	$pdf->RowSinCuadro($aRen);
-}
+} */
 // ______________________________________________________________________________________________________
 function buscaUr($cUr,$ctas){
 	$cNombre = ""; 
@@ -169,10 +203,10 @@ function encabezado($pdf,&$nPag,$cMes){
 
     // Arreglo del Encabezado
     $aCabeza = [
-    	[" ","INSTITUTO NACIONAL ELECTORAL", " "],
+    	[" "," ", " "],
     	[" ",utf8_decode("DIRECCIÓN EJECUTIVA DE ADMINISTRACIÓN")	, utf8_decode("PÁGINA : " ) . $nPag  ] ,
     	[" ",utf8_decode("SUBDIRECCIÓN DE OPERACIÓN BANCARIA" )  	,   "HORA : " . date("H:i:s")		 ] ,
-    	[" ",utf8_decode("RELACIÓN DE CUENTAS BANCARIA BANAMEX")	,  "FECHA : " . date("d/m/Y")		 ]
+    	[" ",utf8_decode("INFORME DE RESPUESTA DE INTERESES")		,  "FECHA : " . date("d/m/Y")		 ]
     ];
 	// Configurar anchos proporcionales
 	$anchoTotal = $pdf->w; // Ancho total de la página
@@ -198,7 +232,7 @@ function encabezado($pdf,&$nPag,$cMes){
    	}
     // -----------------------------
 	$aCabeza = [
-    	["UR","ENTIDAD FEDERATIVA","NO. CUENTA",$cMes  ]
+    	["UR","ENTIDAD FEDERATIVA","NO. CUENTA",utf8_decode("OPERACIÓN"),$cMes  ]
     ];
     $pdf->GuardaXY();
     //$y = $this->GetY();//$this->RecuperaY();
@@ -208,7 +242,7 @@ function encabezado($pdf,&$nPag,$cMes){
     $pdf->Ln(1); // agrega un punto al espaciado
     $pdf->SetWidths($aAnchos); // Ancho de las columnas
     $pdf->SetFont(Letra, 'B', 9);
-    $pdf->SetAligns( ['C','C','C','C']); // Alineación de las columnas
+    $pdf->SetAligns( ['C','C','C','C','C']); // Alineación de las columnas
     foreach ($aCabeza as $row) {
         $pdf->RowSinCuadro($row,null);
     }
@@ -216,7 +250,7 @@ function encabezado($pdf,&$nPag,$cMes){
 
 	// Detalle Páginaletra anchos
 	$pdf->SetFont(Letra, '', 7);
-	$pdf->SetAligns( ['L','L','L','R']);
+	$pdf->SetAligns( ['L','L','L','L','R']);
 	$pdf->SetWidths($aAnchos);
 }
 // ______________________________________________________________________________________________________

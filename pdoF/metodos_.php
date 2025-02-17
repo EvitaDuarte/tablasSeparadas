@@ -226,6 +226,21 @@ public static function CtasOF16(&$r){
     return null;
 }
 //  _______________________________________________________________________________________________
+public static function CtasUrs(&$r){
+    // Se quito por que toavía viene la UR de la anterior distritación estatus is true and  and idunidad!='OF16'
+    $sql =  "select idunidad, ctas_intereses from public.unidades " . 
+            " where  ctas_intereses is not null  " . 
+            " order by estatus desc,idunidad ";
+    $res = ejecutaSQL_($sql);
+    if ( $res!==null){
+        $r["ctasurs"] = $res;
+        $r["success"] = true;
+    }else{
+       $r["success"] = false; 
+    }
+    return null;
+}
+//  _______________________________________________________________________________________________
 //
     /*
     "😀 😃 😄 😁 😆 😞"

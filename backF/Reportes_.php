@@ -113,6 +113,10 @@ try{
 			CtasOF16($respuesta);
 		break;
 		// _______________________________________
+		case "RespuestaPdf":
+			RespuestaPdf($respuesta);
+		break;
+		// _______________________________________
 		default:
 			$respuesta["mensaje"] = "No esta definida en Reportes_.php [" . $vOpc . "]";
 		break;
@@ -859,18 +863,36 @@ function xlsEdoPosFinMensual(&$res){
 // ________________________________________________________________________________________
 function InteresesPdf(&$res){
 	require_once("repo/InteresesPdf_.php");
-	$sql 		 = "select idunidad, nombreunidad from public.unidades where estatus=true " .
-				   " and ctas_intereses is not null and idunidad!='OF16' order by idunidad ";
+	//					and estatus=true se le quito por que todavía hay cuentas de la re-distritación
+	$sql 		 = "select idunidad, nombreunidad from public.unidades where  " .
+				   "  ctas_intereses is not null and idunidad!='OF16' order by idunidad ";
 	$aVal		 = ejecutaSQL_($sql);
 	$res["ctas"] = $aVal;
 	$mensaje	 = "";
 
-	$res["success"] = pdfReporteSaldos($res);
+	$res["success"] = pdfReporteIntereses($res);
 }
 // ________________________________________________________________________________________
 function CtasOF16(&$res){
 	metodos::CtasOF16($res); // Se guarda en $res["resultados"], las cuentas pertenecientes a OF16
+	metodos::CtasUrs($res);
 }
+// ________________________________________________________________________________________
+function RespuestaPdf(&$res){
+	require_once("repo/InteresRespuestaPdf_.php");
+	//					and estatus=true se le quito por que todavía hay cuentas de la re-distritación and idunidad!='OF16'
+	$sql 		 = "select idunidad, nombreunidad from public.unidades where  " .
+				   "  ctas_intereses is not null  order by idunidad ";
+	$aVal		 = ejecutaSQL_($sql);
+	$res["ctas"] = $aVal;
+	$mensaje	 = "";
+
+	$res["success"] = pdfInteresesRespuesta($res);
+}
+// ________________________________________________________________________________________
+// ________________________________________________________________________________________
+// ________________________________________________________________________________________
+// ________________________________________________________________________________________
 // ________________________________________________________________________________________
 //
 ?> 

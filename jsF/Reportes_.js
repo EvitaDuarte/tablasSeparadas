@@ -23,6 +23,8 @@ var lOkCheque 	 = 0;					// Error en los rangos de cheque
 var gLongChe  	 = 8;
 var gResultLines = [];					// Arreglo global g
 var gOfcCtasInt	 = "";					// 
+var gCtasUrs	 = "";
+var gRepo		 = 0;
 
 window.onload = function () {		// Función que se ejecuta al cargar la página HTML que invoca a Consultas.js
 	// Se obtiene el nombre del archivo que lo invoca
@@ -175,10 +177,15 @@ async function procesarRespuesta__(vRes) {
 		// _____________________________________________
 		case "CtasOF16":
 			gOfcCtasInt = vRes.resultados[0].ctas_intereses;
+			gCtasUrs	= vRes.ctasurs;
 			// mandaMensaje(gOfcCtasInt);
 		break;
 		// _____________________________________________
 		case "InteresesPdf":
+			await abrePdf(vRes.archivo);
+		break;
+		// _____________________________________________
+		case "RespuestaPdf":
 			await abrePdf(vRes.archivo);
 		break;
 		// _____________________________________________
@@ -512,7 +519,7 @@ const archivoLayOut = (cOpc,cTit) =>{	// Solicita archivo de layOut
 							if (cOpc==="Intereses"){
 								procesarTxtIntereses(txtContent);
 							}else if(cOpc==="Respuesta"){
-								procesarTxtRespuesta(txtContent);
+								procesarTxtRespuestaInt(txtContent);
 							}
 						};
 						if (cOpc=="Intereses" || cOpc=="Respuesta"){ // Usar para txt o csv
@@ -538,6 +545,7 @@ const procesarTxtIntereses = (txtContent) =>{
 	gResultLines		= [];
 	let listaUrs		= [];
 	oFecha				= obtenerFechaYHora();
+	gRepo				= 1;
 	//cFecha			= oFecha.fechaFormateada;
 	//cHora				= oFecha.horaFormateada;
 
@@ -629,6 +637,16 @@ const procesarTxtIntereses = (txtContent) =>{
 	generarArchivoTXT(gResultLines);
 	expoPdf();
 	document.getElementById("idExportar").value = "";
+	//
+	seccion = document.getElementById("cuadriInteres");
+	// Cambiamos el estilo para hacerla visible
+	seccion.style.display = "block";
+	//
+	seccion = document.getElementById("cuadriRespuesta");
+	// Cambiamos el estilo para hacerla invisible
+	seccion.style.display = "none";
+	//
+	document.getElementById("cajaLayOut").style.display = "none";
 
 /*
 	// Paso 2: Filtrar las líneas que cumplan con las condiciones
@@ -754,18 +772,270 @@ const expoPdf = () =>{
 		mandaMensaje("No se ha cargado el archivo TXT");
 		return false;
 	}
-	aDatos={
-		opcion		: "InteresesPdf",
-		aRes		: gResultLines
+	aDatos = {};
+	if (gRepo==1){
+		aDatos={
+			opcion		: "InteresesPdf",
+			aRes		: gResultLines
+		}
+	}else if(gRepo==2){
+		aDatos={
+			opcion	: "RespuestaPdf",
+			aRes	: gResultLines
+		}
 	}
-	conectayEjecutaPost(aDatos,cPhp1,null);
-
+	if (Object.keys(aDatos).length > 0) {
+		// Si aDatos no está vacío, ejecutamos la función
+		conectayEjecutaPost(aDatos, cPhp1, null);
+	}
 }
 // ________________________________________________________________________________
-const procesarTxtRespuesta = (txtContent) =>{
+const procesarTxtRespuestaInt = (txtContent) =>{
 	// Paso 1: Dividir el contenido por líneas
-	let lines = txtContent.split('\n');
-	mandaMensaje(lines);
+	let lError	 = false;
+	gResultLines = [];
+	gRepo		 = 2;
+	let lines	 = txtContent.split('\n');
+	let line0    = lines[0]
+	if (line0.length<81){
+		// console.log("Linea=",line0);
+		lError = true;
+	}
+	if (lError===false){
+		if (line0.substr(0,4)!="0101" && line0.substr(81,1)!="A"){
+			console.log("Linea=",line0,"letra["+line0.substr(81,1)+"]");
+			lError = true;
+		}
+	}
+	if ( lError ){
+		mandaMensaje("El archivo no parece ser de respuesta de intereses");
+		document.getElementById("idExportar").value = "";
+		return false;
+
+	}
+	lines.forEach(linea => {
+		linea = linea.trim();
+		let lineaFormateada = '';
+		cImpo = linea.substr(54,14);
+		cImpo1= parseInt(cImpo.slice(0, 12) ) + ( parseInt(cImpo.slice(12) ) / 100 );
+		cImpo1= agregarComas(cImpo1);
+		cUrCta= linea.substr(8,20).replace(/^0+/, '');
+		cUr   = buscarIdUnidad(cUrCta);
+
+		// Concatenar cada valor de la línea en una sola cadena sin separadores ni espacios
+		lineaFormateada = { // No usar substring
+			ur		  : cUr,
+			ur_sucu   : linea.substr(4,4),
+			ur_cta    : linea.substr(8,20),
+			of_cta    : linea.substr(34,20),
+			operacion : linea.substr(82,6),
+			importe	  : cImpo1,
+			fecha     : linea.substr(71,6),
+			operador  : linea.substr(90).trim()
+		}
+
+		// Añadir la línea al contenido del archivo, seguida de un salto de línea
+		gResultLines.push(lineaFormateada);
+	});
+	//mandaMensaje(gResultLines);
+	gResultLines = ordenarPorUr(gResultLines);
+	// console.log("Lineas",gResultLines);
+	// - ordenar los resultados
+	//
+	document.getElementById("idExportar").value = "";
+	llenaTablaRespuesta()
+	return true;
 }
+// ________________________________________________________________________________
+const llenaTablaRespuesta = () =>{
+	const cuerpoTabla = document.getElementById('cuerpoR'); // Obtener el cuerpo de la tabla
+
+	// Limpiar el cuerpo de la tabla antes de agregar nuevos datos
+	cuerpoTabla.innerHTML = '';
+
+	// Iterar sobre cada línea de gResultLines y agregar una fila (tr) con celdas (td)
+	gResultLines.forEach(linea => {
+		let fila = document.createElement('tr');
+
+		// Crear las celdas de la fila según los valores de la línea
+		Object.values(linea).forEach(valor => {
+			let celda = document.createElement('td');
+			celda.textContent = valor; // Asignamos el valor de la celda
+			fila.appendChild(celda); // Añadimos la celda a la fila
+		});
+
+		// Añadir la fila al cuerpo de la tabla
+		cuerpoTabla.appendChild(fila);
+	});
+	seccion = document.getElementById("cuadriInteres");
+	// Cambiamos el estilo para hacerla invisible
+	seccion.style.display = "none";
+	//
+	seccion = document.getElementById("cuadriRespuesta");
+	// Cambiamos el estilo para hacerla visible
+	seccion.style.display = "block";
+	document.getElementById("cajaLayOut").style.display = "block";
+}
+// ________________________________________________________________________________
+// Función para buscar el valor de idunidad dado un ctas_intereses
+const buscarIdUnidad = (ctaUr) =>{
+  // Buscar en el arreglo el objeto que tiene ctas_intereses igual al valor de ctaUr
+  //let resultado = gCtasUrs.find(    item => item.ctas_intereses.split(',').includes(ctaUr) );
+	let resultado = gCtasUrs.find(item => 
+    	item.ctas_intereses.split(',').map(x => x.trim()).includes(ctaUr)
+  	);
+  
+	// Si se encuentra, retornar el idunidad
+	if (resultado) {
+		return resultado.idunidad;
+	} else {
+		return "----"; // En caso de que no se encuentre
+	}
+}
+// ________________________________________________________________________________
+// Función para ordenar un arreglo de objetos por la columna 'ur'
+function ordenarPorUr(arr) {
+	return arr.sort((a, b) => {
+		if (a.ur < b.ur) {
+			return -1; // `a` va antes que `b`
+		}
+		if (a.ur > b.ur) {
+			return 1; // `b` va antes que `a`
+		}
+		return 0; // Si son iguales
+	});
+}
+// ________________________________________________________________________________
+/* Revisando no se requiere el detalle de los intereses, sino el acumulado
+const expoXLS = () =>{
+    // Definir el arreglo de objetos que quieres convertir en una tabla de Excel
+    const data = gResultLines.map(item => ({
+        "Beneficiario"	: "INE",
+        "Importe"		: item.importe,
+        "Concepto"		: "Intereses",
+        "Referencia"	: item.operacion,
+        "DOCTO"			: item.fecha,
+        "UR"			: item.ur
+    }));
+
+    // Crea una nueva hoja de trabajo con los datos
+    const ws = XLSX.utils.json_to_sheet(data);
+
+    // Crea un libro de trabajo y agrega la hoja
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+    // Genera un archivo de Excel y lo descarga
+    XLSX.writeFile(wb, "resultado.xlsx");
+}
+*/
+// ________________________________________________________________________________
+// Asegúrate de que ya tienes la librería 'xlsx.min.js' cargada
+function expoXLS() {
+    // Totalizar los importes
+    let totaljle	= 0.00;
+    let totalDto	= 0.00;
+    let totalOf16	= 0.00;
+    linea0 			= gResultLines[0];
+    linea1 			= gResultLines[1];
+    linea2 			= gResultLines[2];
+    //
+    // Extraer el año y mes de la fecha
+    const year 		= linea0.fecha.slice(4); // Los últimos dos dígitos de la fecha
+    const month		= linea0.fecha.slice(2, 4); // Los dos dígitos del mes
+    const monthName = getMonthName(month); // Obtener el nombre del mes
+    // Recorrer los elementos para calcular las sumas
+    gResultLines.forEach(item => {
+    	const importe = parseImporte(item.importe);
+        // Verificar si la UR termina en '00' o no
+        if (item.ur.endsWith('00')) {
+            totaljle += importe;
+        } else {
+        	if (item.ur!='OF16'){
+            	totalDto += importe;
+            }else{
+            	totalOf16+= importe;
+            }
+        }
+    });
+
+    // Crear las filas de totalización para UR terminadas en '00' y las no terminadas en '00'
+    const data = []; // [totalRowJLE, totalRowDTO];
+    if (totaljle>0){
+	    const totalRow = {
+	        "Beneficiario": `JUNTAS EJECUTIVAS LOCALES`,
+	        "Importe": totaljle,
+	        "Concepto": `P${year} INTERESES GENERADOS EN CUENTA DE CHEQUES DE ${monthName} BANAMEX`,
+	        "Referencia": linea0.fecha+linea0.operacion,
+	        "DOCTO": linea0.fecha,
+	        "UR": "200"
+	    };
+	    data.push(totalRow);
+	}
+	if (totalDto>0){
+	    const totalRow = {
+	        "Beneficiario": `JUNTAS EJECUTIVAS DISTRITALES`,
+	        "Importe": totalDto,
+	        "Concepto": `P${year} INTERESES GENERADOS EN CUENTA DE CHEQUES DE ${monthName} BANAMEX`,
+	        "Referencia": linea1.fecha+linea1.operacion,
+	        "DOCTO": linea1.fecha,
+	        "UR": "300"
+	    };
+	    data.push(totalRow);
+	}
+	if (totalOf16>0){
+	    const totalRow = {
+	        "Beneficiario": `DIRECCION EJECUTIVA DE ADMINISTRACIÓN`,
+	        "Importe": totalOf16,
+	        "Concepto": `P${year} INTERESES GENERADOS EN CUENTA DE CHEQUES DE ${monthName} BANAMEX`,
+	        "Referencia": linea2.fecha+linea2.operacion,
+	        "DOCTO": linea1.fecha,
+	        "UR": "OF16"
+	    };
+	    data.push(totalRow);
+	}
+
+
+
+
+    // Crear una hoja de trabajo con los datos
+    //const ws = XLSX.utils.json_to_sheet(data); genera con encabezados
+    const ws = XLSX.utils.json_to_sheet(data, { header: [] });	// Sin encabezados
+
+    // Crear un libro de trabajo
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+    // Generar el archivo XLS y descargarlo
+    XLSX.writeFile(wb, "resultado1.xlsx"); 
+
+/*  Se requiere un arreglo de arreglos para que no mande el encabezado 
+
+	    const totalRow = [
+	        `JUNTAS EJECUTIVAS LOCALES`,
+	        totaljle,
+	        `P${year} INTERESES GENERADOS EN CUENTA DE CHEQUES DE ${monthName} BANAMEX`,
+	        linea0.fecha+linea0.operacion,
+	        linea0.fecha,
+	        "200"
+	    ];
+	    data.push(totalRow);
+
+
+    // Crear una hoja de trabajo a partir de los datos (sin encabezados)
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Crear un libro de trabajo
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Datos");
+
+    // Generar el archivo XLS y descargarlo
+    XLSX.writeFile(wb, "resultado.xlsx");*/
+}
+
+// ________________________________________________________________________________
+// ________________________________________________________________________________
+// ________________________________________________________________________________
+// ________________________________________________________________________________
 // ________________________________________________________________________________
 // ________________________________________________________________________________
