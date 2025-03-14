@@ -10,6 +10,10 @@
         <!-------------General Style's--------------->
         <link rel="stylesheet" href="assetsF/css/panel_style.css">
         <link rel="stylesheet" href="assetsF/css/seccion.css">
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+
     </head>
     <body>
 
@@ -21,76 +25,64 @@
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field-angosto inline-block-input4" style="width:9% !important;">
-                                    <input type="text" name="idOperacion" id="idOperacion"  class="input-text" required maxlength=4
-                                    onkeyup="this.title=this.value;" onblur="exclusivoLetras('Id',this.id)">
-                                    <label for="idOperacion" class="label">Id Operación</label>
-                                </div>
-                                <div class="form-field-angosto inline-block-input3" style="width:20% !important;">
-                                    <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=50
-                                    onkeyup="this.title=this.value;" onblur="sololetras(this.value,'Nombre',this.id)">
-                                    <label for="nombre" class="label">Nombre</label>
-                                </div>
-                                <div class="form-field-angosto inline-block-input4" style="width:12%!important;">
-                                    <p data-name="tipo" class="titles titles-filled">Tipo</p>
-                                    <div class="box" style="width:100% !important;">
-                                        <select name="tipo" id="tipo" class="select-input" onclick="OperacionSaldoCancelacion();" onblur="OperacionSaldoCancelacion();">
+                                <section class="seccion_caja_despliegue" id="secCap">
+                                    <div class="caja_captura">
+                                        <label for="idOperacion" class="lbl_txt">Id Operación</label>
+                                        <input type="text" name="idOperacion" id="idOperacion"  required maxlength=4 
+                                        onkeyup="this.title=this.value;" onblur="exclusivoLetras('Id',this.id)">
+                                    </div>
+                                    <div class="caja_captura3">
+                                        <label for="nombre" class="lbl_txt">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" required maxlength=50
+                                        onkeyup="this.title=this.value;" onblur="sololetras(this.value,'Nombre',this.id)">
+                                    </div>
+                                    <div class="caja_captura">
+                                        <label for="tipo" class="lbl_txt">Tipo</label>
+                                        <select name="tipo" id="tipo" onclick="OperacionSaldoCancelacion();" onblur="OperacionSaldoCancelacion();">
                                             <option value="" >Seleccione</option>
                                             <option value="I">INGRESOS</option>
                                             <option value="E">EGRESOS</option>
                                             <option value="C">CHEQUES</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="form-field-angosto inline-block-input4" style="width:12%!important;">
-                                    <p data-name="operador" class="titles titles-filled">Saldo</p>
-                                    <div class="box" style="width:100% !important;">
-                                        <select name="operador" id="operador" class="select-input">
+                                    <div class="caja_captura">
+                                        <label for="operador" class="lbl_txt">Saldo</label>
+                                        <select name="operador" id="operador">
                                             <option value="" >Seleccione</option>
                                             <option value="+">SUMA AL SALDO</option>
                                             <option value="-">RESTA AL SALDO</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="form-field-angosto inline-block-input4" style="width:22%!important;">
-                                    <p data-name="idOperCan" class="titles titles-filled">Cancelación</p>
-                                    <div class="box" style="width:95% !important;">
-                                        <select name="idOperCan" id="idOperCan" class="select-input">
+                                    <div class="caja_captura">
+                                        <label for="idOperCan" class="lbl_txt">Cancelación</label>
+                                        <select name="idOperCan" id="idOperCan">
                                             <option value="" >Seleccione</option>
                                             <option value="CIN">CANCELACIÓN DE INGRESOS</option>
                                             <option value="CEG">CANCELACIÓN DE EGRESOS</option>
                                             <option value="CAN">CANCELACIÓN DE CHEQUES</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="form-field-angosto inline-block-input4" style="width:14%!important;" id="divActivo">
-                                    <input type="checkbox" id="visualizar" name="visualizar" checked="checked">
-                                    <label for="visualizar" class="labelChk">¿ Visualizar ?</label>
-                                </div>
-                                <hr>
-                                <div class="form-field-button3" id="divBotones">
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="AgregaOperacion();">
+                                    <div class="caja_captura" id="divActivo">
+                                        <label for="visualizar" class="lbl_txt">¿ Visualizar ?</label>
+                                        <input type="checkbox" id="visualizar" name="visualizar" checked="checked">
+                                    </div>
+                                </section>
+                                <section class="seccion_caja" id="botones">
+                                    <div class="form-field-button_" id="grpBotones">
+                                        <a class="btn_1 efecto" onclick="AgregaOperacion();">
                                             <span>Agregar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="ModificaOperacion();">
+                                        <a class="btn_1 efecto" onclick="ModificaOperacion();">
                                             <span>Modificar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="EliminaOperacion();">
+                                        <a class="btn_1 efecto" onclick="EliminaOperacion();">
                                             <span>Eliminar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="limpiaPantalla('frmOpeFin');">
+                                        <a class="btn_1 efecto" onclick="limpiaPantalla('frmOpeFin');">
                                             <span>Nuevo</span>
                                         </a>
                                     </div>
-                                </div>
-                                <hr>
+                                </section>
                                 <div id="paginador" class="pagina"></div>
                                 <div class="tabla-con-cuadricula">
                                     <table class="tablex" id="operacionesBancarias">
@@ -145,5 +137,35 @@
         <script src="jsF/cerrarSesion_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Catalogos_.js"></script>
+        <script>
+            var TablaPadre = $('#operacionesBancarias').DataTable({
+                paging          : true, // Desactiva la paginación
+                searching       : false, // Desactiva la barra de búsqueda
+                pageLength      : 6,
+                lengthChange    : false,
+                fixedHeader     : false,
+                info            : false,
+                ordering        : false,
+                orderCellsTop   : true,
+                initComplete    : function(settings, json) {
+                  var api = this.api();
+                  $(api.table().header()).find('th').css('border', '1px solid black');
+                },
+                columnDefs: [
+                    {
+                        targets: 1,  // Se refiere a la segunda columna (las columnas están indexadas desde 0)
+                        width: '400px'  // Ancho personalizado para la segunda columna
+                    },
+                    {
+                        targets :   3,
+                        width   :   '100px'
+                    },
+                    {
+                        targets :   4,
+                        width   :   '100px'
+                    }
+                ]
+            });
+        </script>
     </body>
 </html>

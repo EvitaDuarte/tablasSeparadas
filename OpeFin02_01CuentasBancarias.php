@@ -16,41 +16,46 @@
         <form name="frmCtaBan" id="frmCtaBan" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); // Incluye el menú principal?>
-                <section class="datos-personales">
+                <section class="datos-personales2">
                     <h2 class="titleM">Cuentas Bancarias</h2>
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
                                 <section class="seccion_caja_despliegue" id="secCta">
-                                    <div class="form-field inline-block-input" style="width:18% !important;">
-                                        <input type="text" name="idCuentaBancaria" id="idCuentaBancaria"  class="input-text" required maxlength=20
+                                    <div class="caja_captura">
+                                        <label for="idCuentaBancaria" class="lbl_txt">Cuenta Bancaria</label>
+                                        <input type="text" name="idCuentaBancaria" id="idCuentaBancaria" required maxlength=20
                                         onkeyup="this.title=this.value;" onblur="soloNumerosGuion(this.value,'Cuenta Bancaria',this.id)">
-                                        <label for="idCuentaBancaria" class="label">Cuenta Bancaria</label>
+                                        
                                     </div>
-                                    <div class="form-field inline-block-input" style="width:30% !important;">
-                                        <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=50
+                                    <div class="caja_captura3">
+                                        <label for="nombre" class="lbl_txt">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" required maxlength=50
                                         onkeyup="this.title=this.value;" onblur="soloCuenta('Nombre',this.id)">
-                                        <label for="nombre" class="label">Nombre</label>
+                                        
                                     </div>
-                                    <div class="form-field inline-block-input" style="width:12% !important;">
-                                        <input type="text" name="siglas" id="siglas"  class="input-text" required maxlength=10
+                                    <div class="caja_captura">
+                                        <label for="siglas" class="lbl_txt">Siglas</label>
+                                        <input type="text" name="siglas" id="siglas"  required maxlength=10
                                         onkeyup="this.title=this.value;" onblur="soloSiglas('Siglas',this.id)">
-                                        <label for="siglas" class="label">Siglas</label>
                                     </div>
-                                </section>
-                                <section class="seccion_caja_despliegue" id="despliegue">
                                     <div class="caja_captura">
                                         <label class="lbl_txt">Banco</label>
                                          <select name="idBanco" id="idBanco" onfocus="this.click();" data-info="Banco" ></select>
                                     </div>
-                                    <div class="form-field inline-block-input" style="width:18%!important;" id="divActivo">
-                                        <input type="checkbox" id="estatus" name="estatus" checked="checked">
-                                        <label for="estatus" class="labelChk">¿ Activa ?</label>
+                                    <div class="caja_captura" id="divActivo">
+                                        <label for="estatus" class="lbl_txt">¿ Activa ?</label>
+                                        <input type="checkbox" id="estatus" name="estatus" checked="checked" style="visibility: visible; display: inline-block;">
+
+                                    </div> 
+                                    <div class="caja_captura" id="divActivo">
+                                        <label for="concilia" class="lbl_txt">¿ Concilia ?</label>
+                                        <input type="checkbox" id="concilia" name="concilia" style="visibility: visible; display: inline-block;">
                                     </div>
-                                    <div class="form-field inline-block-input" style="width:18%!important;" id="divActivo1">
-                                        <input type="checkbox" id="concilia" name="concilia">
-                                        <label for="concilia" class="labelChk">¿ Concilia ?</label>
-                                    </div>
+                                </section>
+                                <section class="seccion_caja_despliegue" id="despliegue">
+
+
                                 </section>
                                 <div class="form-field-button3" id="divBotones">
                                     <div class="form-field-button3" inline-block-input3>

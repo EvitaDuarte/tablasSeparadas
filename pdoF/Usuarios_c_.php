@@ -261,6 +261,18 @@ public function UsuarioNoTieneAsignadoCuentas(){
 	return true;
 }
 // ________________________________________________________________	
+public function cargaUsuario(&$r){
+	$cUsu = $r["datos"]["idUsuario"];
+	$sql  = "select idusuario,nombre,estatus,idesquema,idunidad " .
+			"from usuarios where idusuario='$cUsu'";
+	$res = ejecutaSQL_($sql);
+	if ( $res!=null){
+		$r["datUsu"] = $res;
+	}else{
+		$r["datUsu"] = null;
+	}
+
+}
 // ________________________________________________________________	
 }
 

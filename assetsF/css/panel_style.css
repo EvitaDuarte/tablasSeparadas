@@ -84,6 +84,7 @@ input:required {
     bottom: -20px;
     left: 10px;
     z-index: -99 !important;
+    z-index: 1 !important;
 }
 .logo_sc_bn{
     width: 100%;
@@ -98,6 +99,7 @@ input:required {
     bottom: -20px;
     right: 10px;
     z-index: -99 !important;
+    z-index: 1 !important;
 }
 .logo_ctia_bn{
     width: 100% !important;
@@ -700,6 +702,7 @@ input:-webkit-autofill:active {
     border-right: 3px solid rgb(0, 231, 235); */
     transition: .6s ease;
     margin-bottom: 170px;
+    z-index: 2 !important; /* debe ser mayor a los logos CTIA y Sistemas Complementarios */
 }
 .datos-personales1{
     max-width: 1650px;
@@ -714,6 +717,7 @@ input:-webkit-autofill:active {
     border-right: 3px solid rgb(0, 231, 235); */
     transition: .6s ease;
     margin-bottom: 170px;
+    z-index: 2 !important; /* debe ser mayor a los logos CTIA y Sistemas Complementarios */
 }
 .datos-personales2{
     max-width: 1650px;
@@ -728,6 +732,7 @@ input:-webkit-autofill:active {
     border-right: 3px solid rgb(0, 231, 235); */
     transition: .6s ease;
     margin-bottom: 170px;
+    z-index: 2 !important; /* debe ser mayor a los logos CTIA y Sistemas Complementarios */
 }
 .datos-personales .title, .datos-personales2 .title{
     text-transform: uppercase;
@@ -2423,7 +2428,7 @@ input[type="checkbox"] {
     display: none;
 }
 input[type="checkbox"] + label {
-    line-height: 3em;
+    line-height: 6em; /* 3em */
 }
 input[type="checkbox"]:disabled + label {
     color: #ccc !important;

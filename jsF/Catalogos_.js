@@ -43,6 +43,7 @@ window.onload = function () {
 		break;
 		// ________________________________________
 		case "OpeFin02_04UnidadesResponsables.php":
+
 			aDatos = {
 				opcion : "ConsultaUnidadesResponsables"
 			};
@@ -374,13 +375,14 @@ function ConsultaOperacionesBancarias(aRen,cSesion){
 		  	});
 		}
 	}
+	/*
 	// Se crea una tabla con los botones anterior y siguiente en el div paginador
 	var p = new Paginador(
     	document.getElementById('paginador'), 				// div con botones 
     	document.getElementById('operacionesBancarias'), 	// tabla a paginar
     	6 													// Número de renglones por página
 	);
-	p.Mostrar();
+	p.Mostrar(); */
 }
 // __________________________________
 function OperacionSaldoCancelacion(){
@@ -544,7 +546,12 @@ function nextPage(pagina){
 function ConsultaUnidadesResponsables(aRen,vSesion){
 	var cTabla = "unidadesResponsables";
 	var table  = document.getElementById(cTabla).getElementsByTagName('tbody')[0];
+	
+    /*var filter_selector = $('.dataTables_length select').select2();
 
+    if(filter_selector.length > 0){
+        filter_selector.data('select2').$container.addClass("dataTable_filter");
+    } */
 	limpiaTabla(table);
 
 	// Se llena la tabla con los datos que regreso el SQL
@@ -598,12 +605,43 @@ function ConsultaUnidadesResponsables(aRen,vSesion){
 		  	});
 		}
 	}
-	
+	/*$('#unidadesResponsables').DataTable();*/
+    var TablaPadre = $('#unidadesResponsables').DataTable({
+        paging          : true, // Activa la paginación
+        searching       : true, // Activa la barra de búsqueda
+        fixedHeader     : true,
+        info            : true,
+        ordering        : false,
+        orderCellsTop   : true,
+        initComplete    : function(settings, json) {
+          var api = this.api();
+          $(api.table().header()).find('th').css('border', '1px solid black');
+        },
+        columnDefs: [
+            {
+                targets: 0,  // Se refiere a la segunda columna (las columnas están indexadas desde 0)
+                width: '100px'  // Ancho personalizado para la segunda columna
+            },
+            {
+                targets :   1,
+                width   :   '600px'
+            },
+            {
+                targets :   2,
+                width   :   '100px'
+            }
+        ],
+	    language: {
+	        url: 'assetsF/js/es-ES.json',
+	    },
+		dom: '<"top"lfp>rt<"bottom"i><"clear">' // 'f' es la búsqueda, 't' es la tabla, 'p' es la paginación, 'i' es la información, 'clear' limpia los elementos
+    });
 	// Se crea una tabla con los botones anterior y siguiente en el div paginador
+	/*
 	var p = new Paginador(
     	document.getElementById('paginador'), 	// div con botones 
     	document.getElementById(cTabla), 		// tabla a paginar
     	10 										// Número de renglones por página
 	);
-	p.Mostrar();
+	p.Mostrar(); */
 }

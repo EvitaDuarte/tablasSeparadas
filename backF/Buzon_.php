@@ -195,12 +195,17 @@ function actualizaMovimientos(&$respuesta){
 function validaReferencias(&$respuesta){
 	$regreso = true;
 	$cCtaBan = $respuesta["datos"]["ctBancaria"];
+	$cMovOpe = $respuesta["datos"]["cMovOpe"];
 	foreach ($respuesta["datos"]["aBuzon"] as $rBuzon) {
 		$cRefBan = $rBuzon["referencia"];
-		$idMov   = metodos::ExisteReferenciaBancaria($cRefBan,$cCtaBan);
-		if ( $idMov!="" ){ // Ya existe la referencia
-			$respuesta["mensaje"] = "Ya existe la referencia bancaria $cRefBan con Id:$idMov \n" ;
-			$regreso 			  = false;
+		if ($cMovOpe==="CHE" && ($cRefBan === str_repeat('0', strlen($cRefBan))) ){
+			// dejar pasar cheques con referencia 0000 00000000 00000000000
+		}else{
+			$idMov   = metodos::ExisteReferenciaBancaria($cRefBan,$cCtaBan);
+			if ( $idMov!="" ){ // Ya existe la referencia
+				$respuesta["mensaje"] = "Ya existe la referencia bancaria $cRefBan con Id:$idMov \n" ;
+				$regreso 			  = false;
+			}
 		}
 	}
 	return $regreso;
@@ -210,7 +215,7 @@ function CargaCatalogos(&$respuesta){
 	try{
 		// Traigo Operación-Control
 		$sql = 	"select a.idoperacion, b.idcontrol , b.nombre, a.tipo from operacionesbancarias a , controlesbancarios b " .
-				" where a.idoperacion=b.idoperacion order by nombre ";
+				" where a.idoperacion=b.idoperacion and a.visualizar=true order by nombre ";
 		$res = ejecutaSQL_($sql);
 		if ( $res!=null){
 			$respuesta["combo"][] 	 = " ,Seleccione"; // Valor nulo

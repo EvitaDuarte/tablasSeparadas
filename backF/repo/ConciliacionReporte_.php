@@ -85,7 +85,7 @@ function encabezado($pdf,$aDatos,$aAnchos){
 
     // Arreglo del Encabezado
     $cW  = "CONCILIACIÓN BANCARIA AL " . fechaLetra($aDatos["fecha"]);
-    $cW1 = "BANCO : " . $aDatos["nombre"] . " CUENTA : " . $aDatos["cuenta"] ;
+    $cW1 = "BANCO: " . $aDatos["nombre"] . " CUENTA: " . $aDatos["cuenta"] ;
     $aCabeza = [
     	[" ",utf8_decode("DIRECCIÓN EJECUTIVA DE ADMINISTRACIÓN"), utf8_decode("PÁGINA : " ). $pdf->PageNo() . ' de {totalPages}' ] ,
     	[" ",utf8_decode("SUBDIRECCIÓN DE OPERACIÓN BANCARIA" 	),   "HORA : " . date("H:i:s")					] ,
@@ -95,10 +95,10 @@ function encabezado($pdf,$aDatos,$aAnchos){
     // ___________________________________________________________
 	// Configurar anchos proporcionales
 	$anchoTotal = $pdf->w; // Ancho total de la página
-	$anchoPrimeraColumna = $anchoTotal * 0.50; // 60% del ancho total
+	$anchoPrimeraColumna = $anchoTotal * 0.60; // 60% del ancho total
 	$anchoSegundaColumna = ($anchoTotal - $anchoPrimeraColumna)/2; // El resto del ancho
 
-	$pdf->SetWidths(array($anchoSegundaColumna,$anchoPrimeraColumna, $anchoSegundaColumna));
+	$pdf->SetWidths(array($anchoSegundaColumna-10,$anchoPrimeraColumna, $anchoSegundaColumna+10));
     $pdf->SetAligns(['L','C', 'L']);
     foreach ($aCabeza as $row) {
         $pdf->RowSinCuadro($row);

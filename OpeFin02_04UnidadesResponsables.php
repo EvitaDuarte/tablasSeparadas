@@ -8,6 +8,10 @@
         <!-------------General Style's--------------->
         <link rel="stylesheet" href="assetsF/css/panel_style.css">
         <link rel="stylesheet" href="assetsF/css/seccion.css">
+        <!-- Datatable  -->
+        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/jquery.dataTables.min.css">
+        <script src="assetsF/js/jquery-3.7.1.min.js"></script>
+        <script src="assetsF/js/jquery.dataTables.min.js"></script>
     </head>
     <body>
 
@@ -19,40 +23,37 @@
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field-angosto inline-block-input4" style="width:12% !important;">
-                                    <input type="text" name="idUnidad" id="idUnidad"  class="input-text" required maxlength=4
-                                    onkeyup="this.title=this.value;">
-                                    <label for="idUnidad" class="label">Id Control</label>
-                                </div>
-                                <div class="form-field-angosto inline-block-input3" style="width:30% !important;">
-                                    <input type="text" name="nombreunidad" id="nombreunidad" class="input-text" required maxlength=200
-                                    onkeyup="this.title=this.value;" >
-                                    <label for="nombreunidad" class="label">Nombre</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:20%!important;" id="divActivo">
-                                    <input type="checkbox" id="estatus" name="estatus" checked="checked">
-                                    <label for="estatus" class="labelChk">¿ Activo ?</label>
-                                </div>
-                                <hr>
-                                <div class="form-field-button3" style="display: none;">
-                                    <div class="form-field-button3" inline-block-input3>
+                                <section class="seccion_caja_despliegue" id="secCap">
+                                    <div class="caja_captura">
+                                        <label for="idUnidad" class="lbl_txt">Id Control</label>
+                                        <input type="text" name="idUnidad" id="idUnidad"  required maxlength=4
+                                        onkeyup="this.title=this.value;">
+                                    </div>
+                                    <div class="caja_captura3">
+                                        <label for="nombreunidad" class="lbl_txt">Nombre</label>
+                                        <input type="text" name="nombreunidad" id="nombreunidad" required maxlength=200
+                                        onkeyup="this.title=this.value;" >
+                                    </div>
+                                    <div class="caja_captura" id="divActivo">
+                                        <label for="estatus" class="lbl_txt">¿ Activo ?</label>
+                                        <input type="checkbox" id="estatus" name="estatus" checked="checked">
+                                    </div>
+                                </section>
+                                <section class="seccion_caja" id="botones" style="display: none;">
+                                    <div class="form-field-button_" id="grpBotones">
                                         <a class="btn efecto" onclick="AgregaControl();">
                                             <span>Agregar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
                                         <a class="btn efecto" onclick="ModificaControl();">
                                             <span>Modificar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
                                         <a class="btn efecto" onclick="EliminaControl();">
                                             <span>Eliminar</span>
                                         </a>
                                     </div>
                                 </div>
                                 <hr>
-                                <div id="paginador" class="pagina"></div>
+                                <div id="paginador" class="pagina" style="display: none;"></div>
                                 <div class="tabla-con-cuadricula">
                                     <table class="tablex" id="unidadesResponsables">
                                         <caption class="captionTable">Unidades Responsables del Sistema</caption>
@@ -61,8 +62,8 @@
                                                 <th>Id Unidad</th>
                                                 <th>Nombre</th>
                                                 <th>Activo</th>
+                                                <th>Cta. Int</th>
                                                 <th>Capturó</th>
-                                                <th>Fecha Alta</th>
                                             </tr>
                                         </thead>
                                         <tbody id="cuerpo">
@@ -87,5 +88,10 @@
         <script src="jsF/cerrarSesion_.js"></script>
         <script src="jsF/rutinas_.js"></script>
         <script src="jsF/Catalogos_.js"></script>
+
+        <script>
+
+        </script>
+
     </body>
 </html>

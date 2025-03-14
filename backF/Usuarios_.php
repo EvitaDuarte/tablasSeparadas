@@ -22,8 +22,8 @@
 	//
 	include_once("con_pg_OpeFinW_.php"); 		// Se incluye conexión a la Base de Datos
 	include_once("rutinas_.php");
-	require_once("../pdoF/Usuarios_c_.php");					// Clase Usuarios
-	require_once("../pdoF/Esquemas_c_.php");					// Clase Usuarios
+	require_once("../pdoF/Usuarios_c_.php");	// Clase Usuarios
+	require_once("../pdoF/Esquemas_c_.php");	// Clase Usuarios
 
 	global $conn_pdo;
 	// inicializa arreglo que se regresara a JavaScript y que se podra visualizar en el depurador del navegador que se activa con F12
@@ -93,11 +93,10 @@ return;
 
 // ______________________________________________________________________________________________________
 function validaLdap(&$respuesta){
+	global $oUsuarios;
 	//
 	$username 			  = $respuesta["datos"]["idUsuario"];
 	$respuesta["mensaje"] = "No se encontraron datos del Usuario [$username] en el LDap"; // Asumo que no se encuentra
-	// - SiteGround
-	return;
 	
 	if($connect = @ldap_connect('ldap://autenticacion.ife.org.mx')){					  	// Conectar al servidor Ldap
 		if(($bind = @ldap_bind($connect)) == true){											// Autentificar al usuario
@@ -121,6 +120,7 @@ function validaLdap(&$respuesta){
 				);
 				$respuesta["mensaje"] = "";//"Se encontraron datos del Usuario en el LDap";
 				$respuesta["success"] = true;
+				$oUsuarios->cargaUsuario($respuesta);
 			}
 		}
 	}

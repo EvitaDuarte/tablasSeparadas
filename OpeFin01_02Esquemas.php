@@ -16,49 +16,44 @@
         <form name="frmEsquema" id="frmEsquema" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); ?>
-                <section class="datos-personales">
+                <section class="datos-personales2">
                     <h2 class="titleM">Esquemas de Usuario</h2>
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field inline-block-input" style="width:18% !important;">
-                                    <input type="text" name="idEsquema" id="idEsquema"  class="input-text" required maxlength=2
-                                    onkeyup="this.title=this.value;" onblur="soloNumeros(this.value,'Id',this.id)">
-                                    <label for="idEsquema" class="label">Id Esquema</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:30% !important;">
-                                    <input type="text" name="descripcion" id="descripcion" class="input-text" required maxlength=100 
-                                    onkeyup="this.title=this.value;" onblur="sololetras(this.value,'Descripción',this.id)" >
-                                    <label for="descripcion" class="label">Descripción</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:20%!important;" id="divActivo">
-                                    <input type="checkbox" id="estatus" name="estatus" checked="checked">
-                                    <label for="estatus" class="labelChk">¿ Activo ?</label>
-                                </div>
-                                <hr>
-                                <div class="form-field-button3">
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="EsquemaAgrega();">
-                                            <span>Agregar</span>
-                                        </a>
+                                <section class="seccion_caja_despliegue" id="secCap">
+                                    <div class="caja_captura">
+                                        <label for="idEsquema" class="lbl_txt">Id Esquema</label>
+                                        <input type="text" name="idEsquema" id="idEsquema"  class="input-text" required maxlength=2
+                                        onkeyup="this.title=this.value;" onblur="soloNumeros(this.value,'Id',this.id)">
                                     </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="EsquemaModifica();">
-                                            <span>Modificar</span>
-                                        </a>
+                                    <div class="caja_captura">
+                                        <label for="descripcion" class="lbl_txt">Descripción</label>
+                                        <input type="text" name="descripcion" id="descripcion" class="input-text" required maxlength=100 
+                                        onkeyup="this.title=this.value;" onblur="sololetras(this.value,'Descripción',this.id)" >
                                     </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="EsquemaEliminar();">
-                                            <span>Eliminar</span>
-                                        </a>
+                                   <div class="caja_captura">
+                                        <label for="estatus" class="lbl_txt">¿ Activo ?</label>
+                                        <input type="checkbox" id="estatus" name="estatus" checked="checked" style="visibility: visible; display: inline-block;">
                                     </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="limpiaPantalla('frmEsquema');">
-                                            <span>Nuevo</span>
-                                        </a>
+                                </section>
+                                <section class="seccion_caja" id="botones">
+                                    <div class="form-field-button_" id="grpBotones">
+                                            <a class="btn_1 efecto" onclick="EsquemaAgrega();">
+                                                <span>Agregar</span>
+                                            </a>
+                                            <a class="btn_1 efecto" onclick="EsquemaModifica();">
+                                                <span>Modificar</span>
+                                            </a>
+                                            <a class="btn_1 efecto" onclick="EsquemaEliminar();">
+                                                <span>Eliminar</span>
+                                            </a>
+                                            <a class="btn_1 efecto" onclick="limpiaPantalla('frmEsquema');">
+                                                <span>Nuevo</span>
+                                            </a>
                                     </div>
-                                </div>
-                                <hr>
+                                </section>
+
                                 <div class="tabla-con-cuadricula">
                                     <table class="tablex" id="esquemas">
                                         <caption class="captionTable">Esquemas de Usuario</caption>

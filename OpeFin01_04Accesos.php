@@ -13,47 +13,37 @@
         <form name="frmAcceso" id="frmAcceso" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); // Incluye el menú principal?>
-                <section class="datos-personales">
+                <section class="datos-personales2">
                     <h2 class="titleM">Catálogo de Accesos</h2>
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field inline-block-input" style="width:50%!important;">
-                                    <p data-name="idCuentaBancaria" class="titles titles-filled">Cuenta Bancaria</p>
-                                    <div class="box" style="width:95% !important;">
+                                <section class="seccion_caja_despliegue" id="secCap">
+                                    <div class="caja_captura">
+                                        <label for="idCuentaBancaria" class="lbl_txt">Cuenta Bancaria</label>
                                         <select name="idCuentaBancaria" id="idCuentaBancaria" class="select-input"></select>
                                     </div>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:30%!important;">
-                                    <p data-name="idUsuario" class="titles titles-filled">Usuario</p>
-                                    <div class="box" style="width:95% !important;">
+                                    <div class="caja_captura">
+                                        <label for="idUsuario" class="lbl_txt">Usuario</label>
                                         <select name="idUsuario" id="idUsuario" class="select-input"></select>
                                     </div>
-                                </div>
-                                <hr>
-                                <div class="form-field-button3">
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="AccesosAgrega();">
+                                </section>
+                                <section class="seccion_caja" id="botones">
+                                    <div class="form-field-button_" id="grpBotones">
+                                        <a class="btn_1 efecto" onclick="AccesosAgrega();">
                                             <span>Agregar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="AccesosBusca();">
+                                        <a class="btn_1 efecto" onclick="AccesosBusca();">
                                             <span>Buscar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="AccesosElimina();">
+                                        <a class="btn_1 efecto" onclick="AccesosElimina();">
                                             <span>Eliminar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="limpiaPantalla('frmAcceso');">
+                                        <a class="btn_1 efecto" onclick="limpiaPantalla('frmAcceso');">
                                             <span>Nuevo</span>
                                         </a>
                                     </div>
-                                </div>
-                                <hr>
+                                </section>
                                 <div class="tabla-con-cuadricula">
                                     <table class="tablex" id="accesos">
                                         <caption class="captionTable">Accesos de Usuarios a Cuentas Bancarias</caption>

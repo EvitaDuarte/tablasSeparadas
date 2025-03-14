@@ -591,7 +591,7 @@ function imprimeCheque(&$respuesta){
 }
 // ________________________________________________________________________________________
 function ImpresionRangoCheques(&$res){
-	require_once("../pdo/NumeroALetras_.php");
+	require_once("../pdoF/NumeroALetras_.php");
 	require_once("repo/ImprimeRangoCheques_.php");
 	try{
 		$cCta	= $res["datos"]["idCuenta"];

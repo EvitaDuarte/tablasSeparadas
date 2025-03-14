@@ -10,10 +10,8 @@
         <!-------------General Style's--------------->
         <link rel="stylesheet" href="assetsF/css/panel_style.css">
         <link rel="stylesheet" href="assetsF/css/seccion.css">
-        <div id="focus-table"></div>
     </head>
     <body>
-
         <form name="frmUsuario" id="frmUsuario" method="post" enctype="multipart/form-data">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); // Incluye el menú principal?>
@@ -22,57 +20,49 @@
                     <div class="container-data">
                         <div class="data-form">
                             <div class="wrapper">
-                                <div class="form-field inline-block-input" style="width:18% !important;">
-                                    <input type="text" name="idUsuario" id="idUsuario"  class="input-text" required maxlength=30
-                                    onkeyup="this.title=this.value;" onblur="validaLdap();">
-                                    <label for="idUsuario" class="label">Id Usuario</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:30% !important;">
-                                    <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=200 
-                                    onkeyup="this.title=this.value;" oninput="this.value = this.value.toUpperCase();" 
-                                    onblur="sololetras(this.value,'Nombre',this.id);">
-                                    <label for="nombre" class="label">Nombre</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:7% !important;">
-                                    <input type="text" name="idUnidad" id="idUnidad"  data-info="U.R." class="input-text" required maxlength=4
-                                    onkeyup="this.title=this.value;" onblur="exclusivoUR(this);">
-                                    <label for="idUnidad" class="label">U.R.</label>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:18%!important;">
-                                    <p data-name="idEsquema" class="titles titles-filled">Esquema</p>
-                                    <div class="box" style="width:95% !important;">
-                                        <select name="idEsquema" id="idEsquema" data-info="Esquema" 
-                                        class="select-input" onblur="validarSeleccion(this)">
+                                <section class="seccion_caja_despliegue" id="secCap">
+                                    <div class="caja_captura">
+                                        <label for="idUsuario" class="lbl_txt">Id Usuario</label>
+                                        <input type="text" name="idUsuario" id="idUsuario"  required 
+                                        maxlength=30 onkeyup="this.title=this.value;" onblur="validaLdap();">
+                                    </div>
+                                    <div class="caja_captura3">
+                                        <label for="nombre" class="lbl_txt">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" required  
+                                        maxlength=200 onkeyup="this.title=this.value;" oninput="this.value = this.value.toUpperCase();" 
+                                        onblur="sololetras(this.value,'Nombre',this.id);">
+                                    </div>
+                                    <div class="caja_captura">
+                                        <label for="idUnidad" class="lbl_txt">U.R.</label>
+                                        <input type="text" name="idUnidad" id="idUnidad"  data-info="U.R." required 
+                                        maxlength=4 onkeyup="this.title=this.value;" onblur="exclusivoUR(this);">
+                                    </div>
+                                    <div class="caja_captura">
+                                        <label for="idUnidad" class="lbl_txt">Esquema</label>
+                                        <select name="idEsquema" id="idEsquema" data-info="Esquema" onblur="validarSeleccion(this)">
                                         </select>
                                     </div>
-                                </div>
-                                <div class="form-field inline-block-input" style="width:10%!important;" id="divActivo">
-                                    <input type="checkbox" id="estatus" name="estatus" checked="checked">
-                                    <label for="estatus" class="labelChk">¿ Activo ?</label>
-                                </div>
-                                <hr>
-                                <div class="form-field-button3">
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="UsuarioAgrega();">
+                                    <div class="caja_captura">
+                                        <label for="estatus" class="lbl_txt">¿ Activo ?</label>
+                                        <input type="checkbox" id="estatus" name="estatus" checked="checked" style="visibility: visible; display: inline-block;">
+                                    </div>
+                                </section>
+                                <section class="seccion_caja" id="botones">
+                                    <div class="form-field-button_" id="grpBotones">
+                                        <a class="btn_1 efecto" onclick="UsuarioAgrega();">
                                             <span>Agregar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="UsuarioModifica();">
+                                        <a class="btn_1 efecto" onclick="UsuarioModifica();">
                                             <span>Modificar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="UsuarioEliminar();">
+                                        <a class="btn_1 efecto" onclick="UsuarioEliminar();">
                                             <span>Eliminar</span>
                                         </a>
-                                    </div>
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="limpiaPantalla('frmUsuario');">
+                                        <a class="btn_1 efecto" onclick="limpiaPantalla('frmUsuario');">
                                             <span>Nuevo</span>
                                         </a>
                                     </div>
-                                </div>
+                            </section>
                                 <hr>
                                 <div class="tabla-con-cuadricula">
                                     <table class="tablex" id="usuarios">

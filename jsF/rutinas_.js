@@ -211,7 +211,8 @@ function soloImportesPositivos(input,lValida=false){
 }
 // _________________________________
 function soloCuenta(cCampo,cHTML,lValida=false){
-    var patron = /^[a-zA-ZñÑ\s]+(?:\s-\s(?:\d{4}|\(\d{4}-\d{4}\)))?$/
+    //var patron = /^[a-zA-ZñÑ\s]+(?:\s-\s(?:\d{4}|\(\d{4}-\d{4}\)))?$/;
+    var patron = /^[a-zA-ZñÑ0-9-() ]+$/;
     cObj = document.getElementById(cHTML);
     cVar = cObj.value.trim();
     if (cVar===""){
@@ -228,7 +229,7 @@ function soloCuenta(cCampo,cHTML,lValida=false){
     }else{
         cObj.focus();
         cObj.click();
-        mandaMensaje(cCampo+": solo puede llevar Letras - Año");
+        mandaMensaje(cCampo+": solo puede llevar Letras - Numeros ()");
         return false;
     }
 }

@@ -320,14 +320,16 @@ const paginaMovimientos = (cPag)=>{
 	cCampos  = "a.idcuentabancaria,a.folio,a.importeoperacion,a.referenciabancaria,a.beneficiario,a.fechaoperacion ";
 	cTipos   = "C,C,N,C,C,D"; // C - Caracter , N Número , D - Fecha
 	//
+	cTabla = "atablas.t_" + cCta;
+	//
 	aDatos = {
 		opcion 			: "ConsultaMovimientosBancarios",
 		limite			: document.getElementById("num_registros").value,
 		busca			: document.getElementById("campo").value,
 		pagina 			: pagina,
-		tabla			: " movimientos a ",
+		tabla			: " " + cTabla + " a  ",
 		tablaPrin		: "movimientos",
-		join			: " idCuentabancaria='"+cCta+"' and idoperacion='CHE' and estatus!='C' ",
+		join			: " a.idCuentabancaria='"+cCta+"' and a.idoperacion='CHE' and a.estatus!='C' ",
 		campos			: cCampos,
 		tipos			: cTipos,
 		id 				: "idmovimiento",

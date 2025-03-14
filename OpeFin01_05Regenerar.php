@@ -12,7 +12,7 @@
             <input type="hidden" id="s_usuario"    name="s_usuario"    value="<?= $usrClave ?>">
             <div id="main_container">    
                 <?php include('OpeFin00_MenuPrincipal.php'); ?>
-                <section class="datos-personales">
+                <section class="datos-personales2">
                     <h2 class="titleM">Reconstrucción de Saldos</h2>
                     <div class="container-data">
                         <div class="data-form">
@@ -54,9 +54,9 @@
                                     </div>
 								</section>
 <!-- 							_______________________________________________________________________________					-->
-                                <section class="seccion_caja_despliegue" id="despliegue2">
-                                    <div class="form-field-button3" inline-block-input3>
-                                        <a class="btn efecto" onclick="ReconstruirSaldos();">
+                                <section class="seccion_caja" id="botones">
+                                    <div class="form-field-button_" id="grpBotones">
+                                        <a class="btn_1 efecto" onclick="ReconstruirSaldos();">
                                             <span>Reconstruir</span>
                                         </a>
                                     </div>

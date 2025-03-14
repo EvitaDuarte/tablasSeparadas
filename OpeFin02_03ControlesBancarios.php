@@ -24,16 +24,16 @@
                                 <section class="seccion_caja" id="captura">
                                     <div class="caja_captura" caja="cajaIdCtrl">
                                         <label class="lbl_txt">Id Control</label>
-                                        <input type="text" name="idControl" id="idControl"  class="input-text" required maxlength=15
+                                        <input type="text" name="idControl" id="idControl" required maxlength=15
                                         onkeyup="this.title=this.value;" oninput="this.value = this.value.toUpperCase();" onblur="exclusivoLetras('Id Control',this.id);">
                                     </div>
                                     <div class="caja_captura" id="cajaOpe">
-                                        <p data-name="idOperacion" class="titles titles-filled">Id Operación Bancaria</p>
-                                        <select name="idOperacion" id="idOperacion" class="select-input"></select>
+                                        <label for="idOperacion" class="lbl_txt">Id Operación Bancaria</label>
+                                        <select name="idOperacion" id="idOperacion"></select>
                                     </div>
                                     <div class="caja_captura1" id="cajaNombre" style="width:50% !important;">
-                                        <label class="lbl_txt">Nombre</label>
-                                        <input type="text" name="nombre" id="nombre" class="input-text" required maxlength=80
+                                        <label class="lbl_txt" for="nombre">Nombre</label>
+                                        <input type="text" name="nombre" id="nombre" required maxlength=80
                                         onkeyup="this.title=this.value;" oninput="this.value = this.value.toUpperCase();" onblur="sololetras(this.value,'Nombre',this.id);" >
                                     </div>
                                 </section>

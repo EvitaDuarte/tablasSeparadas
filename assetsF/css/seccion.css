@@ -89,6 +89,19 @@ Azul oscuro - rgb (15,26,47) - 0F1A2F
     font-weight: bold;
     margin-bottom: 4px;
 }
+.caja_captura3 input[type="text"]{
+    color: rgb(149,0,84);
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.caja_captura input[type="checkbox"] {
+    transform: scale(1.5); /* Escala el tamaño del checkbox */
+    margin-right: 10px; /* Espacio adicional entre el label y el checkbox */
+    visibility: visible;
+    display: inline-block;
+}
 .caja_captura_check{
     color: rgb(149,0,84);
     display: block;

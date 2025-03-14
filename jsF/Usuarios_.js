@@ -46,7 +46,7 @@ async function procesarRespuesta__(vRespuesta) {				// Define una promesa para e
         	await UsuariosTabla(vRespuesta.resultados,vRespuesta.combo);
         	break;			// Refresca la tabla HTML con los nuevos datos
     	case "validaLdap":
-    		await UsuariosLdap(vRespuesta.resultados);
+    		await UsuariosLdap(vRespuesta.resultados,vRespuesta.datUsu);
     	break;
 // 		------------------------------------ 
     }
@@ -175,23 +175,29 @@ function UsuariosTabla(aRen,aCombo){// aRen contiene todos los elementos que reg
 }
 // ______________________________________________
 function validaLdap(){
-	cUsu 		= document.getElementById("idUsuario").value.trim();
-	//if ( cUsu!="" ){
+	cUsu = document.getElementById("idUsuario").value.trim();
+	if ( cUsu!="" ){
 		if ( soloDominio(cUsu,"Usuario:","idUsuario") ){
-			/* SiteGround
 			aParametros = {
 				opcion 		: "validaLdap",
 			    idUsuario 	: cUsu,
 			}
-			//conectayEjecuta(aParametros);
-			conectayEjecutaPost(aParametros,cPhp,null); */
+			conectayEjecutaPost(aParametros,cPhp,null);
 		}
-	//}
+	}
 }
 // ______________________________________________
-function UsuariosLdap(vLdap){
+function UsuariosLdap(vLdap,vDatUsu){
 	document.getElementById("nombre").value		= vLdap["cn"]["0"]; // Nombre Completo del Usuario
 	document.getElementById("idUnidad").value	= vLdap["ur"];		// Unidad donde labora el empleado
+	if(vDatUsu!=null){
+		document.getElementById("nombre").value		= vDatUsu[0]["nombre"];
+		document.getElementById("idUnidad").value	= vDatUsu[0]["idunidad"];
+		document.getElementById("idEsquema").value	= vDatUsu[0]["idesquema"];
+		document.getElementById("estatus").value	= vDatUsu[0]["estatus"]==true?1:0;
+	}else{
+		document.getElementById("idEsquema").value	= "";
+	}
 }
 // __________________________________________________________________________________________________________
 // __________________________________________________________________________________________________________

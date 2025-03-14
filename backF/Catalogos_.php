@@ -490,7 +490,7 @@ function EliminaControl(&$respuesta){
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 // _________________________________________________
 function ConsultaUnidadesResponsables(&$respuesta){
-	$sql = "select idunidad, nombreunidad, estatus, usuarioalta, fechaalta from unidades order by idunidad";
+	$sql = "select idunidad, nombreunidad, estatus, ctas_intereses,usuarioalta from unidades order by idunidad";
 	$res = ejecutaSQL_($sql);
 	if ( $res!=null){
 		$respuesta["resultados"] = $res;
